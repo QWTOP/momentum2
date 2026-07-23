@@ -482,7 +482,16 @@ end)
 local autoWall = false
 local canJump = true
 local params = RaycastParams.new()
-params.FilterType = Enum.RaycastFilterType.Excluded
+do
+    local ok, err = pcall(function()
+        params.FilterType = Enum.RaycastFilterType.Excluded
+    end)
+    if not ok then
+        pcall(function()
+            params.FilterType = Enum.RaycastFilterType.Blacklist
+        end)
+    end
+end
 
 function findWall()
     local char = plr.Character
@@ -1233,7 +1242,16 @@ local function findWallForBag()
     local hrp = char:FindFirstChild("HumanoidRootPart")
     if not hrp then return nil end
     local p = RaycastParams.new()
-    p.FilterType = Enum.RaycastFilterType.Excluded
+    do
+        local ok2, err2 = pcall(function()
+            p.FilterType = Enum.RaycastFilterType.Excluded
+        end)
+        if not ok2 then
+            pcall(function()
+                p.FilterType = Enum.RaycastFilterType.Blacklist
+            end)
+        end
+    end
     p.FilterDescendantsInstances = {char}
     local checks = {
         hrp.CFrame.LookVector * 3,
