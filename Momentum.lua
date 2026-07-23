@@ -293,6 +293,8 @@ local function destroyScript()
         chamsHighlights = {}
     end
 
+    detachFromWall()
+
     local char = plr.Character
     if char then
         local hum = char:FindFirstChildOfClass("Humanoid")
@@ -1192,6 +1194,210 @@ end
 spinBindBtn.MouseButton1Click:Connect(function()
     startSpinBind()
 end)
+
+-- WALLBAG
+local wallbagEnabled = false
+local wallbagActive = false
+local wallbagConn = nil
+local wallbagMovers = {}
+
+local function findWallForBag()
+    local char = plr.Character
+    if not char then return nil end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return nil end
+    local p = RaycastParams.new()
+    p.FilterType = Enum.RaycastFilterType.Blacklist
+    p.FilterDescendantsInstances = {char}
+    local dir = hrp.CFrame.LookVector
+    local ray = workspace:Raycast(hrp.Position, dir * 3, p)
+    if ray then return ray end
+    local right = workspace:Raycast(hrp.Position, hrp.CFrame.RightVector * 3, p)
+    if right then return right end
+    local left = workspace:Raycast(hrp.Position, -hrp.CFrame.RightVector * 3, p)
+    if left then return left end
+    local back = workspace:Raycast(hrp.Position, -dir * 3, p)
+    if back then return back end
+    return nil
+end
+
+local function clearWallbagMovers()
+    local char = plr.Character
+    if char then
+        for _, name in ipairs({"WallbagPos", "WallbagGyro", "WallbagVel"}) do
+            local m = char:FindFirstChild(name)
+            if m then m:Destroy() end
+        end
+    end
+    wallbagMovers = {}
+end
+
+local function attachToWall(wall)
+    local char = plr.Character
+    if not char then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not hrp or not hum then return end
+
+    clearWallbagMovers()
+
+    local normal = wall.Normal
+    local wallPos = wall.Position + normal * 1.5
+    local lookAway = -normal
+
+    local bg = Instance.new("BodyGyro")
+    bg.Name = "WallbagGyro"
+    bg.MaxTorque = Vector3.new(1e6, 1e6, 1e6)
+    bg.P = 50000
+    bg.D = 500
+    bg.CFrame = CFrame.lookAt(hrp.Position, hrp.Position + lookAway)
+    bg.Parent = hrp
+
+    local bp = Instance.new("BodyPosition")
+    bp.Name = "WallbagPos"
+    bp.MaxForce = Vector3.new(1e6, 1e6, 1e6)
+    bp.P = 50000
+    bp.D = 1000
+    bp.Position = wallPos + Vector3.new(0, -1, 0)
+    bp.Parent = hrp
+
+    local bv = Instance.new("BodyVelocity")
+    bv.Name = "WallbagVel"
+    bv.MaxForce = Vector3.new(1e6, 1e6, 1e6)
+    bv.Velocity = Vector3.new(0, 0, 0)
+    bv.P = 10000
+    bv.Parent = hrp
+
+    hum.PlatformStand = true
+    wallbagMovers = {bg, bp, bv}
+    wallbagActive = true
+
+    wallbagConn = RS.RenderStepped:Connect(function()
+        if not wallbagActive or scriptDestroyed then
+            clearWallbagMovers()
+            if hum and hum.Parent then hum.PlatformStand = false end
+            if wallbagConn then wallbagConn:Disconnect() wallbagConn = nil end
+            wallbagActive = false
+            return
+        end
+        bg.CFrame = CFrame.lookAt(hrp.Position, hrp.Position + lookAway)
+        bp.Position = wallPos + Vector3.new(0, -1, 0)
+        bv.Velocity = Vector3.new(0, 0, 0)
+    end)
+end
+
+local function detachFromWall()
+    wallbagActive = false
+    clearWallbagMovers()
+    if wallbagConn then wallbagConn:Disconnect() wallbagConn = nil end
+    local char = plr.Character
+    if char then
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if hum then hum.PlatformStand = false end
+    end
+end
+
+local function toggleWallbag()
+    if wallbagActive then
+        detachFromWall()
+    else
+        local wall = findWallForBag()
+        if wall then attachToWall(wall) end
+    end
+end
+
+-- WALLBAG CHECKBOX
+local wbCheck = Instance.new("Frame")
+wbCheck.Size = UDim2.new(0, 16, 0, 16)
+wbCheck.Position = UDim2.new(0, 15, 0, 195)
+wbCheck.BackgroundColor3 = BG_LIGHT
+wbCheck.BorderSizePixel = 0
+wbCheck.Parent = mainTab
+addCorner(wbCheck, 3)
+
+local wbFill = Instance.new("Frame")
+wbFill.Size = UDim2.new(1, -4, 1, -4)
+wbFill.Position = UDim2.new(0, 2, 0, 2)
+wbFill.BackgroundColor3 = BG_HOVER
+wbFill.BorderSizePixel = 0
+wbFill.Parent = wbCheck
+
+local wbLab = Instance.new("TextLabel")
+wbLab.Size = UDim2.new(0, 140, 0, 16)
+wbLab.Position = UDim2.new(0, 22, 0, 0)
+wbLab.BackgroundTransparency = 1
+wbLab.Text = "wallbag"
+wbLab.Font = Enum.Font.GothamBold
+wbLab.TextSize = 14
+wbLab.TextColor3 = TXT_DIM
+wbLab.TextXAlignment = Enum.TextXAlignment.Left
+wbLab.Parent = wbCheck
+
+local wbBtn = Instance.new("TextButton")
+wbBtn.Size = UDim2.new(1, 0, 1, 0)
+wbBtn.BackgroundTransparency = 1
+wbBtn.Text = ""
+wbBtn.Parent = wbCheck
+
+wbBtn.MouseButton1Click:Connect(function()
+    wallbagEnabled = not wallbagEnabled
+    wbFill.BackgroundColor3 = wallbagEnabled and ACCENT or BG_HOVER
+end)
+
+local wbBindBtn = Instance.new("TextButton")
+wbBindBtn.Size = UDim2.new(0, 40, 0, 16)
+wbBindBtn.Position = UDim2.new(0, 170, 0, 195)
+wbBindBtn.BackgroundColor3 = BG_LIGHT
+wbBindBtn.BorderSizePixel = 0
+wbBindBtn.Text = "bind"
+wbBindBtn.Font = Enum.Font.GothamBold
+wbBindBtn.TextSize = 12
+wbBindBtn.TextColor3 = TXT_DIM
+wbBindBtn.Parent = mainTab
+addCorner(wbBindBtn, 4)
+
+local wallbagBind = {}
+local wbBindListener = nil
+
+local function startWbBind()
+    if wbBindListener then wbBindListener:Disconnect() end
+    wbLab.Text = "press key..."
+    wbBindListener = UIS.InputBegan:Connect(function(i)
+        wbBindListener:Disconnect()
+        wbBindListener = nil
+        local ok = pcall(function()
+            local itv = getTypeValue(i)
+            if itv == KEYBD then
+                wallbagBind = {type = "keyboard", key = i.KeyCode}
+                wbLab.Text = "wallbag [" .. i.KeyCode.Name .. "]"
+            else
+                wallbagBind = {type = "other", inputTypeValue = itv}
+                local name = tostring(i.UserInputType):match("%w+$") or tostring(itv)
+                wbLab.Text = "wallbag [" .. name .. "]"
+            end
+        end)
+        if not ok then
+            wallbagBind = {}
+            wbLab.Text = "wallbag [bound]"
+        end
+    end)
+end
+
+wbBindBtn.MouseButton1Click:Connect(function()
+    startWbBind()
+end)
+
+track(UIS.InputBegan:Connect(function(i)
+    if scriptDestroyed then return end
+    if not wallbagEnabled then return end
+    local ok = pcall(function()
+        if wallbagBind.type == "keyboard" and i.KeyCode == wallbagBind.key then
+            toggleWallbag()
+        elseif wallbagBind.type == "other" and i.UserInputType.Value == wallbagBind.inputTypeValue then
+            toggleWallbag()
+        end
+    end)
+end))
 
 -- ESP
 local espEnabled = false
