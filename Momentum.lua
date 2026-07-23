@@ -122,7 +122,7 @@ TS:Create(blur, TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.O
 -- "M" fades in
 TS:Create(mLabel, TweenInfo.new(1.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
 
-wait(0.8)
+task.wait(0.8)
 
 -- "OMENTUM" slides up + fades in
 TS:Create(oLabel, TweenInfo.new(0.7, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0, Position = UDim2.new(0, 100, 0, 0)}):Play()
@@ -133,7 +133,7 @@ TS:Create(accentLine, TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirec
 -- credit fades in
 TS:Create(creditLab, TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0.4), {TextTransparency = 0.3}):Play()
 
-wait(2.2)
+task.wait(2.2)
 
 -- === FADE OUT ===
 TS:Create(blur, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = 0}):Play()
@@ -143,12 +143,12 @@ TS:Create(oLabel, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection
 TS:Create(accentLine, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {BackgroundTransparency = 1}):Play()
 TS:Create(creditLab, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {TextTransparency = 1}):Play()
 
-wait(0.6)
+task.wait(0.6)
 for _, b in ipairs(game:GetService("Lighting"):GetChildren()) do
     if b:IsA("BlurEffect") then b:Destroy() end
 end
 sg:Destroy()
-wait(0.3)
+task.wait(0.3)
 
 -- MENU
 local ACCENT = Color3.fromRGB(100, 70, 255)
@@ -515,19 +515,19 @@ function doWallhop(wall)
     if away.Magnitude < 0.1 then away = Vector3.new(0, 0, 1) end
 
     hrp.CFrame = CFrame.lookAt(hrp.Position, hrp.Position + away)
-    wait()
+    task.wait()
     hum:ChangeState(Enum.HumanoidStateType.Jumping)
     hrp.CFrame = hrp.CFrame * CFrame.Angles(0, -1, 0)
-    wait(0.15)
+    task.wait(0.15)
     hrp.CFrame = hrp.CFrame * CFrame.Angles(0, 1, 0)
-    wait(0.05)
+    task.wait(0.05)
     hrp.CFrame = CFrame.lookAt(hrp.Position, hrp.Position - away)
-    wait(0.1)
+    task.wait(0.1)
     canJump = true
 end
 
 task.spawn(function()
-    while wait() do
+    while task.wait() do
         if scriptDestroyed then break end
         if autoWall then
             local w = findWall()
