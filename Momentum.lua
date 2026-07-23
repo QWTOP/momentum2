@@ -1199,7 +1199,31 @@ end)
 local wallbagEnabled = false
 local wallbagActive = false
 local wallbagConn = nil
-local wallbagMovers = {}
+local wallbagChar = nil
+local wallbagNormal = nil
+local wallbagWallPos = nil
+
+local function clearWallbagMovers()
+    if wallbagChar then
+        for _, name in ipairs({"WallbagPos", "WallbagGyro", "WallbagVel"}) do
+            local m = wallbagChar:FindFirstChild(name)
+            if m then m:Destroy() end
+        end
+    end
+end
+
+local function detachFromWall()
+    wallbagActive = false
+    clearWallbagMovers()
+    if wallbagConn then wallbagConn:Disconnect() wallbagConn = nil end
+    if wallbagChar then
+        local hum = wallbagChar:FindFirstChildOfClass("Humanoid")
+        if hum then hum.PlatformStand = false end
+    end
+    wallbagChar = nil
+    wallbagNormal = nil
+    wallbagWallPos = nil
+end
 
 local function findWallForBag()
     local char = plr.Character
@@ -1209,27 +1233,17 @@ local function findWallForBag()
     local p = RaycastParams.new()
     p.FilterType = Enum.RaycastFilterType.Blacklist
     p.FilterDescendantsInstances = {char}
-    local dir = hrp.CFrame.LookVector
-    local ray = workspace:Raycast(hrp.Position, dir * 3, p)
-    if ray then return ray end
-    local right = workspace:Raycast(hrp.Position, hrp.CFrame.RightVector * 3, p)
-    if right then return right end
-    local left = workspace:Raycast(hrp.Position, -hrp.CFrame.RightVector * 3, p)
-    if left then return left end
-    local back = workspace:Raycast(hrp.Position, -dir * 3, p)
-    if back then return back end
-    return nil
-end
-
-local function clearWallbagMovers()
-    local char = plr.Character
-    if char then
-        for _, name in ipairs({"WallbagPos", "WallbagGyro", "WallbagVel"}) do
-            local m = char:FindFirstChild(name)
-            if m then m:Destroy() end
-        end
+    local checks = {
+        hrp.CFrame.LookVector * 3,
+        hrp.CFrame.RightVector * 3,
+        -hrp.CFrame.RightVector * 3,
+        -hrp.CFrame.LookVector * 3,
+    }
+    for _, dir in ipairs(checks) do
+        local ray = workspace:Raycast(hrp.Position, dir, p)
+        if ray then return ray end
     end
-    wallbagMovers = {}
+    return nil
 end
 
 local function attachToWall(wall)
@@ -1239,11 +1253,12 @@ local function attachToWall(wall)
     local hum = char:FindFirstChildOfClass("Humanoid")
     if not hrp or not hum then return end
 
-    clearWallbagMovers()
+    detachFromWall()
 
-    local normal = wall.Normal
-    local wallPos = wall.Position + normal * 1.5
-    local lookAway = -normal
+    wallbagChar = char
+    wallbagNormal = wall.Normal
+    wallbagWallPos = wall.Position + wall.Normal * 1.5
+    local lookAway = -wallbagNormal
 
     local bg = Instance.new("BodyGyro")
     bg.Name = "WallbagGyro"
@@ -1258,7 +1273,7 @@ local function attachToWall(wall)
     bp.MaxForce = Vector3.new(1e6, 1e6, 1e6)
     bp.P = 50000
     bp.D = 1000
-    bp.Position = wallPos + Vector3.new(0, -1, 0)
+    bp.Position = wallbagWallPos + Vector3.new(0, -1, 0)
     bp.Parent = hrp
 
     local bv = Instance.new("BodyVelocity")
@@ -1269,37 +1284,28 @@ local function attachToWall(wall)
     bv.Parent = hrp
 
     hum.PlatformStand = true
-    wallbagMovers = {bg, bp, bv}
     wallbagActive = true
 
     wallbagConn = RS.RenderStepped:Connect(function()
-        if not wallbagActive or scriptDestroyed then
-            clearWallbagMovers()
-            if hum and hum.Parent then hum.PlatformStand = false end
+        if not wallbagActive then
             if wallbagConn then wallbagConn:Disconnect() wallbagConn = nil end
-            wallbagActive = false
             return
         end
-        bg.CFrame = CFrame.lookAt(hrp.Position, hrp.Position + lookAway)
-        bp.Position = wallPos + Vector3.new(0, -1, 0)
-        bv.Velocity = Vector3.new(0, 0, 0)
+        pcall(function()
+            local bg2 = char:FindFirstChild("WallbagGyro")
+            local bp2 = char:FindFirstChild("WallbagPos")
+            local bv2 = char:FindFirstChild("WallbagVel")
+            if bg2 then bg2.CFrame = CFrame.lookAt(hrp.Position, hrp.Position + lookAway) end
+            if bp2 then bp2.Position = wallbagWallPos + Vector3.new(0, -1, 0) end
+            if bv2 then bv2.Velocity = Vector3.new(0, 0, 0) end
+        end)
     end)
-end
-
-local function detachFromWall()
-    wallbagActive = false
-    clearWallbagMovers()
-    if wallbagConn then wallbagConn:Disconnect() wallbagConn = nil end
-    local char = plr.Character
-    if char then
-        local hum = char:FindFirstChildOfClass("Humanoid")
-        if hum then hum.PlatformStand = false end
-    end
 end
 
 local function toggleWallbag()
     if wallbagActive then
-        detachFromWall()
+    detachFromWall()
+    wallbagEnabled = false
     else
         local wall = findWallForBag()
         if wall then attachToWall(wall) end
