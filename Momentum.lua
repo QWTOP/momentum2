@@ -281,7 +281,6 @@ local function destroyScript()
 
     if gui and gui.Parent then gui:Destroy() end
     if espGui and espGui.Parent then espGui:Destroy() end
-    if wmGui and wmGui.Parent then wmGui:Destroy() end
 
     for _, b in ipairs(game:GetService("Lighting"):GetChildren()) do
         if b:IsA("BlurEffect") then b:Destroy() end
@@ -1678,101 +1677,6 @@ chBtn.Parent = chCheck
 chBtn.MouseButton1Click:Connect(function()
     chamsEnabled = not chamsEnabled
     chFill.BackgroundColor3 = chamsEnabled and ACCENT or BG_HOVER
-end)
-
--- WATERMARK
-local wmEnabled = true
-
-local wmGui = Instance.new("ScreenGui")
-wmGui.Name = "MomentumWM"
-wmGui.ResetOnSpawn = false
-wmGui.IgnoreGuiInset = true
-wmGui.DisplayOrder = 102
-wmGui.Parent = parent
-
-local wmFrame = Instance.new("Frame")
-wmFrame.Size = UDim2.new(0, 260, 0, 26)
-wmFrame.Position = UDim2.new(1, -270, 0, 10)
-wmFrame.BackgroundColor3 = BG_DARK
-wmFrame.BackgroundTransparency = 0.35
-wmFrame.BorderSizePixel = 0
-wmFrame.Parent = wmGui
-addCorner(wmFrame, 6)
-
-local wmStroke = Instance.new("UIStroke")
-wmStroke.Color = ACCENT_DIM
-wmStroke.Thickness = 1
-wmStroke.Transparency = 0.5
-wmStroke.Parent = wmFrame
-
-local wmLabel = Instance.new("TextLabel")
-wmLabel.Size = UDim2.new(1, -12, 1, 0)
-wmLabel.Position = UDim2.new(0, 6, 0, 0)
-wmLabel.BackgroundTransparency = 1
-wmLabel.Text = "Momentum | FPS: 0 | 00:00:00"
-wmLabel.Font = Enum.Font.GothamBold
-wmLabel.TextSize = 12
-wmLabel.TextColor3 = ACCENT_GLOW
-wmLabel.TextTransparency = 0.25
-wmLabel.TextXAlignment = Enum.TextXAlignment.Center
-wmLabel.TextYAlignment = Enum.TextYAlignment.Center
-wmLabel.Parent = wmFrame
-
-local fpsCount = 0
-local fpsLast = tick()
-
-track(RS.RenderStepped:Connect(function()
-    if scriptDestroyed then return end
-    fpsCount = fpsCount + 1
-    local now = tick()
-    if now - fpsLast >= 1 then
-        local fps = fpsCount
-        fpsCount = 0
-        fpsLast = now
-        local h = os.date("%H")
-        local m = os.date("%M")
-        local s = os.date("%S")
-        wmLabel.Text = "Momentum | FPS: " .. fps .. " | " .. h .. ":" .. m .. ":" .. s
-    end
-    wmFrame.Visible = wmEnabled
-end))
-
--- WATERMARK CHECKBOX
-local wmCheck = Instance.new("Frame")
-wmCheck.Size = UDim2.new(0, 16, 0, 16)
-wmCheck.Position = UDim2.new(0, 15, 0, 105)
-wmCheck.BackgroundColor3 = BG_LIGHT
-wmCheck.BorderSizePixel = 0
-wmCheck.Parent = visualTab
-addCorner(wmCheck, 3)
-
-local wmFill = Instance.new("Frame")
-wmFill.Size = UDim2.new(1, -4, 1, -4)
-wmFill.Position = UDim2.new(0, 2, 0, 2)
-wmFill.BackgroundColor3 = ACCENT
-wmFill.BorderSizePixel = 0
-wmFill.Parent = wmCheck
-
-local wmLab = Instance.new("TextLabel")
-wmLab.Size = UDim2.new(0, 140, 0, 16)
-wmLab.Position = UDim2.new(0, 22, 0, 0)
-wmLab.BackgroundTransparency = 1
-wmLab.Text = "watermark"
-wmLab.Font = Enum.Font.GothamBold
-wmLab.TextSize = 14
-wmLab.TextColor3 = TXT_DIM
-wmLab.TextXAlignment = Enum.TextXAlignment.Left
-wmLab.Parent = wmCheck
-
-local wmBtn = Instance.new("TextButton")
-wmBtn.Size = UDim2.new(1, 0, 1, 0)
-wmBtn.BackgroundTransparency = 1
-wmBtn.Text = ""
-wmBtn.Parent = wmCheck
-
-wmBtn.MouseButton1Click:Connect(function()
-    wmEnabled = not wmEnabled
-    wmFill.BackgroundColor3 = wmEnabled and ACCENT or BG_HOVER
 end)
 
 -- WORLD TAB - SHADERS
