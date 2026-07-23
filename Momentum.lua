@@ -1305,8 +1305,7 @@ end
 
 local function toggleWallbag()
     if wallbagActive then
-    detachFromWall()
-    wallbagEnabled = false
+        detachFromWall()
     else
         local wall = findWallForBag()
         if wall then attachToWall(wall) end
