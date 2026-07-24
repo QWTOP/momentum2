@@ -3,33 +3,6 @@ local TS = game:GetService("TweenService")
 local plr = game:GetService("Players").LocalPlayer
 local parent = plr:WaitForChild("PlayerGui")
 
-local function showError(msg)
-    local sg = Instance.new("ScreenGui")
-    sg.Name = "MomentumError"
-    sg.ResetOnSpawn = false
-    sg.Parent = parent
-    local f = Instance.new("Frame")
-    f.Size = UDim2.new(0, 500, 0, 300)
-    f.Position = UDim2.new(0.5, -250, 0.5, -150)
-    f.BackgroundColor3 = Color3.fromRGB(12, 12, 22)
-    f.BorderSizePixel = 0
-    f.Parent = sg
-    local t = Instance.new("TextLabel")
-    t.Size = UDim2.new(1, -20, 1, -20)
-    t.Position = UDim2.new(0, 10, 0, 10)
-    t.BackgroundTransparency = 1
-    t.Text = tostring(msg)
-    t.Font = Enum.Font.Code
-    t.TextSize = 14
-    t.TextColor3 = Color3.fromRGB(255, 80, 80)
-    t.TextWrapped = true
-    t.TextXAlignment = Enum.TextXAlignment.Left
-    t.TextYAlignment = Enum.TextYAlignment.Top
-    t.Parent = f
-end
-
-local _ok, _err = pcall(function()
-
 local KEYBD = Enum.UserInputType.Keyboard.Value
 local scriptDestroyed = false
 local allConns = {}
@@ -308,7 +281,6 @@ local function destroyScript()
 
     if gui and gui.Parent then gui:Destroy() end
     if espGui and espGui.Parent then espGui:Destroy() end
-    if wmScreen and wmScreen.Parent then wmScreen:Destroy() end
 
     for _, b in ipairs(game:GetService("Lighting"):GetChildren()) do
         if b:IsA("BlurEffect") then b:Destroy() end
@@ -1725,105 +1697,6 @@ chBtn.MouseButton1Click:Connect(function()
     chFill.BackgroundColor3 = chamsEnabled and ACCENT or BG_HOVER
 end)
 
--- WATERMARK
-local wmEnabled = true
-
-local wmScreen = Instance.new("ScreenGui")
-wmScreen.Name = "MomentumWatermark"
-wmScreen.ResetOnSpawn = false
-wmScreen.IgnoreGuiInset = true
-wmScreen.DisplayOrder = 102
-wmScreen.Parent = parent
-
-local wmContainer = Instance.new("Frame")
-wmContainer.Size = UDim2.new(0, 180, 0, 30)
-wmContainer.Position = UDim2.new(1, -190, 0, 10)
-wmContainer.BackgroundTransparency = 1
-wmContainer.Parent = wmScreen
-
-local wmM = Instance.new("TextLabel")
-wmM.Size = UDim2.new(0, 24, 0, 30)
-wmM.Position = UDim2.new(0, 0, 0, 0)
-wmM.BackgroundTransparency = 1
-wmM.Text = "M"
-wmM.Font = Enum.Font.GothamBold
-wmM.TextSize = 26
-wmM.TextColor3 = ACCENT
-wmM.TextXAlignment = Enum.TextXAlignment.Left
-wmM.TextYAlignment = Enum.TextYAlignment.Center
-wmM.Parent = wmContainer
-
-local wmO = Instance.new("TextLabel")
-wmO.Size = UDim2.new(0, 150, 0, 30)
-wmO.Position = UDim2.new(0, 24, 0, 0)
-wmO.BackgroundTransparency = 1
-wmO.Text = "OMENTUM"
-wmO.Font = Enum.Font.GothamBold
-wmO.TextSize = 26
-wmO.TextColor3 = TXT
-wmO.TextTransparency = 0.1
-wmO.TextXAlignment = Enum.TextXAlignment.Left
-wmO.TextYAlignment = Enum.TextYAlignment.Center
-wmO.Parent = wmContainer
-
-local wmLine = Instance.new("Frame")
-wmLine.Size = UDim2.new(0, 150, 0, 2)
-wmLine.Position = UDim2.new(0, 24, 1, -4)
-wmLine.BorderSizePixel = 0
-wmLine.BackgroundColor3 = Color3.new(1, 1, 1)
-wmLine.Parent = wmContainer
-
-local wmLineGrad = Instance.new("UIGradient")
-wmLineGrad.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, ACCENT_DIM),
-    ColorSequenceKeypoint.new(0.5, ACCENT_GLOW),
-    ColorSequenceKeypoint.new(1, ACCENT_DIM),
-})
-wmLineGrad.Parent = wmLine
-
-track(RS.RenderStepped:Connect(function()
-    if scriptDestroyed then return end
-    wmScreen.Enabled = wmEnabled
-end))
-
--- WATERMARK CHECKBOX
-local wmCheck = Instance.new("Frame")
-wmCheck.Size = UDim2.new(0, 16, 0, 16)
-wmCheck.Position = UDim2.new(0, 15, 0, 105)
-wmCheck.BackgroundColor3 = BG_LIGHT
-wmCheck.BorderSizePixel = 0
-wmCheck.Parent = visualTab
-addCorner(wmCheck, 3)
-
-local wmFill = Instance.new("Frame")
-wmFill.Size = UDim2.new(1, -4, 1, -4)
-wmFill.Position = UDim2.new(0, 2, 0, 2)
-wmFill.BackgroundColor3 = ACCENT
-wmFill.BorderSizePixel = 0
-wmFill.Parent = wmCheck
-
-local wmLab = Instance.new("TextLabel")
-wmLab.Size = UDim2.new(0, 140, 0, 16)
-wmLab.Position = UDim2.new(0, 22, 0, 0)
-wmLab.BackgroundTransparency = 1
-wmLab.Text = "watermark"
-wmLab.Font = Enum.Font.GothamBold
-wmLab.TextSize = 14
-wmLab.TextColor3 = TXT_DIM
-wmLab.TextXAlignment = Enum.TextXAlignment.Left
-wmLab.Parent = wmCheck
-
-local wmBtn = Instance.new("TextButton")
-wmBtn.Size = UDim2.new(1, 0, 1, 0)
-wmBtn.BackgroundTransparency = 1
-wmBtn.Text = ""
-wmBtn.Parent = wmCheck
-
-wmBtn.MouseButton1Click:Connect(function()
-    wmEnabled = not wmEnabled
-    wmFill.BackgroundColor3 = wmEnabled and ACCENT or BG_HOVER
-end)
-
 -- WORLD TAB - SHADERS
 local SHADER_URLS = {
     "https://raw.githubusercontent.com/randomstring0/pshade-ultimate/refs/heads/main/shr/",
@@ -2294,9 +2167,3 @@ UIS.InputBegan:Connect(function(inp, gp)
         end
     end
 end)
-
-end)
-
-if not _ok then
-    showError("MOMENTUM ERROR:\n" .. tostring(_err))
-end
