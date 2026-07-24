@@ -3,6 +3,33 @@ local TS = game:GetService("TweenService")
 local plr = game:GetService("Players").LocalPlayer
 local parent = plr:WaitForChild("PlayerGui")
 
+local function showError(msg)
+    local sg = Instance.new("ScreenGui")
+    sg.Name = "MomentumError"
+    sg.ResetOnSpawn = false
+    sg.Parent = parent
+    local f = Instance.new("Frame")
+    f.Size = UDim2.new(0, 500, 0, 300)
+    f.Position = UDim2.new(0.5, -250, 0.5, -150)
+    f.BackgroundColor3 = Color3.fromRGB(12, 12, 22)
+    f.BorderSizePixel = 0
+    f.Parent = sg
+    local t = Instance.new("TextLabel")
+    t.Size = UDim2.new(1, -20, 1, -20)
+    t.Position = UDim2.new(0, 10, 0, 10)
+    t.BackgroundTransparency = 1
+    t.Text = tostring(msg)
+    t.Font = Enum.Font.Code
+    t.TextSize = 14
+    t.TextColor3 = Color3.fromRGB(255, 80, 80)
+    t.TextWrapped = true
+    t.TextXAlignment = Enum.TextXAlignment.Left
+    t.TextYAlignment = Enum.TextYAlignment.Top
+    t.Parent = f
+end
+
+local _ok, _err = pcall(function()
+
 local KEYBD = Enum.UserInputType.Keyboard.Value
 local scriptDestroyed = false
 local allConns = {}
@@ -2267,3 +2294,9 @@ UIS.InputBegan:Connect(function(inp, gp)
         end
     end
 end)
+
+end)
+
+if not _ok then
+    showError("MOMENTUM ERROR:\n" .. tostring(_err))
+end
