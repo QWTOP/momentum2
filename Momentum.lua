@@ -1,3 +1,5 @@
+local ok, err = pcall(function()
+
 local UIS = game:GetService("UserInputService")
 local TS = game:GetService("TweenService")
 local plr = game:GetService("Players").LocalPlayer
@@ -90,13 +92,7 @@ accentLine.BackgroundTransparency = 1
 accentLine.Parent = sg
 
 local lineGradient = Instance.new("UIGradient")
-lineGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, SPLASH_BG),
-    ColorSequenceKeypoint.new(0.3, SPLASH_DIM),
-    ColorSequenceKeypoint.new(0.5, SPLASH_ACCENT),
-    ColorSequenceKeypoint.new(0.7, SPLASH_DIM),
-    ColorSequenceKeypoint.new(1, SPLASH_BG),
-})
+lineGradient.Color = ColorSequence.new(ColorSequenceKeypoint.new(0, SPLASH_BG), ColorSequenceKeypoint.new(0.3, SPLASH_DIM), ColorSequenceKeypoint.new(0.5, SPLASH_ACCENT), ColorSequenceKeypoint.new(0.7, SPLASH_DIM), ColorSequenceKeypoint.new(1, SPLASH_BG))
 lineGradient.Parent = accentLine
 
 -- credit
@@ -241,13 +237,7 @@ ln.BorderSizePixel = 0
 ln.BackgroundColor3 = Color3.new(1, 1, 1)
 ln.Parent = h
 local lnGrad = Instance.new("UIGradient")
-lnGrad.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, BG_MID),
-    ColorSequenceKeypoint.new(0.3, ACCENT_DIM),
-    ColorSequenceKeypoint.new(0.5, ACCENT_GLOW),
-    ColorSequenceKeypoint.new(0.7, ACCENT_DIM),
-    ColorSequenceKeypoint.new(1, BG_MID),
-})
+lnGrad.Color = ColorSequence.new(ColorSequenceKeypoint.new(0, BG_MID), ColorSequenceKeypoint.new(0.3, ACCENT_DIM), ColorSequenceKeypoint.new(0.5, ACCENT_GLOW), ColorSequenceKeypoint.new(0.7, ACCENT_DIM), ColorSequenceKeypoint.new(1, BG_MID))
 lnGrad.Parent = ln
 
 local destroyBtn = Instance.new("TextButton")
@@ -2159,3 +2149,38 @@ UIS.InputBegan:Connect(function(inp, gp)
         end
     end
 end)
+
+end)
+
+if not ok then
+    pcall(function()
+        local errGui = Instance.new("ScreenGui")
+        errGui.Name = "MomentumError"
+        errGui.ResetOnSpawn = false
+        errGui.IgnoreGuiInset = true
+        errGui.DisplayOrder = 999
+        errGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+        local errFrame = Instance.new("Frame")
+        errFrame.Size = UDim2.new(0, 600, 0, 200)
+        errFrame.Position = UDim2.new(0.5, -300, 0.5, -100)
+        errFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 22)
+        errFrame.BorderSizePixel = 0
+        errFrame.Parent = errGui
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 10)
+        corner.Parent = errFrame
+        local errLabel = Instance.new("TextLabel")
+        errLabel.Size = UDim2.new(1, -20, 1, -20)
+        errLabel.Position = UDim2.new(0, 10, 0, 10)
+        errLabel.BackgroundTransparency = 1
+        errLabel.Text = "MOMENTUM ERROR:\n" .. tostring(err)
+        errLabel.Font = Enum.Font.Code
+        errLabel.TextSize = 14
+        errLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+        errLabel.TextXAlignment = Enum.TextXAlignment.Left
+        errLabel.TextYAlignment = Enum.TextYAlignment.Top
+        errLabel.TextWrapped = true
+        errLabel.Parent = errFrame
+        task.delay(10, function() errGui:Destroy() end)
+    end)
+end
