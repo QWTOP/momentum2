@@ -294,6 +294,8 @@ local function destroyScript()
     end
 
     detachFromWall()
+    stopFly()
+    if flyConn then flyConn:Disconnect() flyConn = nil end
 
     local char = plr.Character
     if char then
@@ -1421,6 +1423,215 @@ track(UIS.InputBegan:Connect(function(i)
         elseif wallbagBind.type == "other" and i.UserInputType.Value == wallbagBind.inputTypeValue then
             toggleWallbag()
         end
+    end)
+end))
+
+-- FLY
+local flyEnabled = false
+local flySpeed = 60
+local flyBV, flyBG = nil, nil
+local flyW, flyA, flyS, flyD, flySpace, flyShift = false, false, false, false, false, false
+
+local function startFly()
+    local char = plr.Character
+    if not char then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not hrp or not hum then return end
+
+    flyBG = Instance.new("BodyGyro")
+    flyBG.MaxTorque = Vector3.new(1e6, 1e6, 1e6)
+    flyBG.P = 50000
+    flyBG.D = 500
+    flyBG.Parent = hrp
+
+    flyBV = Instance.new("BodyVelocity")
+    flyBV.MaxForce = Vector3.new(1e6, 1e6, 1e6)
+    flyBV.P = 10000
+    flyBV.Velocity = Vector3.new(0, 0, 0)
+    flyBV.Parent = hrp
+end
+
+local function stopFly()
+    if flyBV then flyBV:Destroy() flyBV = nil end
+    if flyBG then flyBG:Destroy() flyBG = nil end
+    flyW, flyA, flyS, flyD, flySpace, flyShift = false, false, false, false, false, false
+end
+
+local flyConn = nil
+
+local function startFlyLoop()
+    if flyConn then flyConn:Disconnect() end
+    flyConn = RS.RenderStepped:Connect(function()
+        if scriptDestroyed or not flyEnabled then
+            if flyConn then flyConn:Disconnect() flyConn = nil end
+            return
+        end
+        local char = plr.Character
+        if not char then return end
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+
+        local cam = workspace.CurrentCamera
+        local look = cam.CFrame.LookVector
+        local right = cam.CFrame.RightVector
+        local up = Vector3.new(0, 1, 0)
+
+        local dir = Vector3.new(0, 0, 0)
+        if flyW then dir = dir + look end
+        if flyS then dir = dir - look end
+        if flyD then dir = dir + right end
+        if flyA then dir = dir - right end
+        if flySpace then dir = dir + up end
+        if flyShift then dir = dir - up end
+
+        if dir.Magnitude > 0 then
+            dir = dir.Unit
+        end
+
+        if flyBG then
+            flyBG.CFrame = CFrame.lookAt(hrp.Position, hrp.Position + look)
+        end
+        if flyBV then
+            flyBV.Velocity = dir * flySpeed
+        end
+    end)
+end
+
+-- FLY CHECKBOX
+local flCheck = Instance.new("Frame")
+flCheck.Size = UDim2.new(0, 16, 0, 16)
+flCheck.Position = UDim2.new(0, 15, 0, 255)
+flCheck.BackgroundColor3 = BG_LIGHT
+flCheck.BorderSizePixel = 0
+flCheck.Parent = mainTab
+addCorner(flCheck, 3)
+
+local flFill = Instance.new("Frame")
+flFill.Size = UDim2.new(1, -4, 1, -4)
+flFill.Position = UDim2.new(0, 2, 0, 2)
+flFill.BackgroundColor3 = BG_HOVER
+flFill.BorderSizePixel = 0
+flFill.Parent = flCheck
+
+local flLab = Instance.new("TextLabel")
+flLab.Size = UDim2.new(0, 140, 0, 16)
+flLab.Position = UDim2.new(0, 22, 0, 0)
+flLab.BackgroundTransparency = 1
+flLab.Text = "fly"
+flLab.Font = Enum.Font.GothamBold
+flLab.TextSize = 14
+flLab.TextColor3 = TXT_DIM
+flLab.TextXAlignment = Enum.TextXAlignment.Left
+flLab.Parent = flCheck
+
+local flBtn = Instance.new("TextButton")
+flBtn.Size = UDim2.new(1, 0, 1, 0)
+flBtn.BackgroundTransparency = 1
+flBtn.Text = ""
+flBtn.Parent = flCheck
+
+flBtn.MouseButton1Click:Connect(function()
+    flyEnabled = not flyEnabled
+    flFill.BackgroundColor3 = flyEnabled and ACCENT or BG_HOVER
+    if flyEnabled then
+        startFly()
+        startFlyLoop()
+    else
+        stopFly()
+    end
+end)
+
+local flBindBtn = Instance.new("TextButton")
+flBindBtn.Size = UDim2.new(0, 40, 0, 16)
+flBindBtn.Position = UDim2.new(0, 170, 0, 255)
+flBindBtn.BackgroundColor3 = BG_LIGHT
+flBindBtn.BorderSizePixel = 0
+flBindBtn.Text = "bind"
+flBindBtn.Font = Enum.Font.GothamBold
+flBindBtn.TextSize = 12
+flBindBtn.TextColor3 = TXT_DIM
+flBindBtn.Parent = mainTab
+addCorner(flBindBtn, 4)
+
+local flyBind = {}
+local flBindListener = nil
+
+local function startFlBind()
+    if flBindListener then flBindListener:Disconnect() end
+    flLab.Text = "press key..."
+    flBindListener = UIS.InputBegan:Connect(function(i)
+        flBindListener:Disconnect()
+        flBindListener = nil
+        local ok = pcall(function()
+            local itv = getTypeValue(i)
+            if itv == KEYBD then
+                flyBind = {type = "keyboard", key = i.KeyCode}
+                flLab.Text = "fly [" .. i.KeyCode.Name .. "]"
+            else
+                flyBind = {type = "other", inputTypeValue = itv}
+                local name = tostring(i.UserInputType):match("%w+$") or tostring(itv)
+                flLab.Text = "fly [" .. name .. "]"
+            end
+        end)
+        if not ok then
+            flyBind = {}
+            flLab.Text = "fly [bound]"
+        end
+    end)
+end
+
+flBindBtn.MouseButton1Click:Connect(function()
+    startFlBind()
+end)
+
+track(UIS.InputBegan:Connect(function(i)
+    if scriptDestroyed then return end
+    local ok = pcall(function()
+        if flyBind.type == "keyboard" and i.KeyCode == flyBind.key then
+            flyEnabled = not flyEnabled
+            flFill.BackgroundColor3 = flyEnabled and ACCENT or BG_HOVER
+            if flyEnabled then
+                startFly()
+                startFlyLoop()
+            else
+                stopFly()
+            end
+        elseif flyBind.type == "other" and i.UserInputType.Value == flyBind.inputTypeValue then
+            flyEnabled = not flyEnabled
+            flFill.BackgroundColor3 = flyEnabled and ACCENT or BG_HOVER
+            if flyEnabled then
+                startFly()
+                startFlyLoop()
+            else
+                stopFly()
+            end
+        end
+    end)
+end))
+
+track(UIS.InputBegan:Connect(function(i)
+    if scriptDestroyed then return end
+    if not flyEnabled then return end
+    pcall(function()
+        if i.KeyCode == Enum.KeyCode.W then flyW = true end
+        if i.KeyCode == Enum.KeyCode.A then flyA = true end
+        if i.KeyCode == Enum.KeyCode.S then flyS = true end
+        if i.KeyCode == Enum.KeyCode.D then flyD = true end
+        if i.KeyCode == Enum.KeyCode.Space then flySpace = true end
+        if i.KeyCode == Enum.KeyCode.LeftShift then flyShift = true end
+    end)
+end))
+
+track(UIS.InputEnded:Connect(function(i)
+    if scriptDestroyed then return end
+    pcall(function()
+        if i.KeyCode == Enum.KeyCode.W then flyW = false end
+        if i.KeyCode == Enum.KeyCode.A then flyA = false end
+        if i.KeyCode == Enum.KeyCode.S then flyS = false end
+        if i.KeyCode == Enum.KeyCode.D then flyD = false end
+        if i.KeyCode == Enum.KeyCode.Space then flySpace = false end
+        if i.KeyCode == Enum.KeyCode.LeftShift then flyShift = false end
     end)
 end))
 
