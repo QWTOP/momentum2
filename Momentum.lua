@@ -92,7 +92,7 @@ accentLine.BackgroundTransparency = 1
 accentLine.Parent = sg
 
 local lineGradient = Instance.new("UIGradient")
-lineGradient.Color = ColorSequence.new(ColorSequenceKeypoint.new(0, SPLASH_BG), ColorSequenceKeypoint.new(0.3, SPLASH_DIM), ColorSequenceKeypoint.new(0.5, SPLASH_ACCENT), ColorSequenceKeypoint.new(0.7, SPLASH_DIM), ColorSequenceKeypoint.new(1, SPLASH_BG))
+lineGradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, SPLASH_BG), ColorSequenceKeypoint.new(0.3, SPLASH_DIM), ColorSequenceKeypoint.new(0.5, SPLASH_ACCENT), ColorSequenceKeypoint.new(0.7, SPLASH_DIM), ColorSequenceKeypoint.new(1, SPLASH_BG)})
 lineGradient.Parent = accentLine
 
 -- credit
@@ -237,7 +237,7 @@ ln.BorderSizePixel = 0
 ln.BackgroundColor3 = Color3.new(1, 1, 1)
 ln.Parent = h
 local lnGrad = Instance.new("UIGradient")
-lnGrad.Color = ColorSequence.new(ColorSequenceKeypoint.new(0, BG_MID), ColorSequenceKeypoint.new(0.3, ACCENT_DIM), ColorSequenceKeypoint.new(0.5, ACCENT_GLOW), ColorSequenceKeypoint.new(0.7, ACCENT_DIM), ColorSequenceKeypoint.new(1, BG_MID))
+lnGrad.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, BG_MID), ColorSequenceKeypoint.new(0.3, ACCENT_DIM), ColorSequenceKeypoint.new(0.5, ACCENT_GLOW), ColorSequenceKeypoint.new(0.7, ACCENT_DIM), ColorSequenceKeypoint.new(1, BG_MID)})
 lnGrad.Parent = ln
 
 local destroyBtn = Instance.new("TextButton")
