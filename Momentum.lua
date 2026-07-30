@@ -1,3 +1,26 @@
+pcall(function()
+local sg = Instance.new("ScreenGui")
+sg.Name = "MomentumLoad"
+sg.ResetOnSpawn = false
+sg.IgnoreGuiInset = true
+sg.DisplayOrder = 998
+pcall(function() sg.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui", 5) end)
+if not sg.Parent then pcall(function() sg.Parent = game:GetService("CoreGui") end) end
+local t = Instance.new("TextLabel")
+t.Size = UDim2.new(0, 200, 0, 30)
+t.Position = UDim2.new(0.5, -100, 0, 10)
+t.BackgroundColor3 = Color3.fromRGB(100, 70, 255)
+t.BackgroundTransparency = 0.2
+t.Text = "Momentum loading..."
+t.Font = Enum.Font.GothamBold
+t.TextSize = 14
+t.TextColor3 = Color3.new(1, 1, 1)
+t.BorderSizePixel = 0
+t.Parent = sg
+Instance.new("UICorner", t).CornerRadius = UDim.new(0, 6)
+task.delay(8, function() pcall(function() sg:Destroy() end) end)
+end)
+
 local ok, err = pcall(function()
 
 local UIS = game:GetService("UserInputService")
