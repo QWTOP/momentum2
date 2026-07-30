@@ -476,7 +476,32 @@ local autoWall = false
 local canJump = true
 local params = RaycastParams.new()
 do
-    local ok, err = pcall(function()
+pcall(function()
+    local sg = Instance.new("ScreenGui")
+    sg.Name = "MomentumLoading"
+    sg.ResetOnSpawn = false
+    sg.IgnoreGuiInset = true
+    sg.DisplayOrder = 998
+    local ok2, pg = pcall(function()
+        return game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui", 5)
+    end)
+    sg.Parent = ok2 and pg or game:GetService("CoreGui")
+    local t = Instance.new("TextLabel")
+    t.Size = UDim2.new(0, 200, 0, 30)
+    t.Position = UDim2.new(0.5, -100, 0, 10)
+    t.BackgroundColor3 = Color3.fromRGB(100, 70, 255)
+    t.BackgroundTransparency = 0.2
+    t.Text = "Momentum loading..."
+    t.Font = Enum.Font.GothamBold
+    t.TextSize = 14
+    t.TextColor3 = Color3.new(1, 1, 1)
+    t.BorderSizePixel = 0
+    t.Parent = sg
+    Instance.new("UICorner", t).CornerRadius = UDim.new(0, 6)
+    task.delay(8, function() if sg and sg.Parent then sg:Destroy() end end)
+end)
+
+local ok, err = pcall(function()
         params.FilterType = Enum.RaycastFilterType.Excluded
     end)
     if not ok then
@@ -2276,33 +2301,50 @@ end)
 
 if not ok then
     pcall(function()
-        local errGui = Instance.new("ScreenGui")
-        errGui.Name = "MomentumError"
-        errGui.ResetOnSpawn = false
-        errGui.IgnoreGuiInset = true
-        errGui.DisplayOrder = 999
-        errGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
-        local errFrame = Instance.new("Frame")
-        errFrame.Size = UDim2.new(0, 600, 0, 200)
-        errFrame.Position = UDim2.new(0.5, -300, 0.5, -100)
-        errFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 22)
-        errFrame.BorderSizePixel = 0
-        errFrame.Parent = errGui
-        local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 10)
-        corner.Parent = errFrame
-        local errLabel = Instance.new("TextLabel")
-        errLabel.Size = UDim2.new(1, -20, 1, -20)
-        errLabel.Position = UDim2.new(0, 10, 0, 10)
-        errLabel.BackgroundTransparency = 1
-        errLabel.Text = "MOMENTUM ERROR:\n" .. tostring(err)
-        errLabel.Font = Enum.Font.Code
-        errLabel.TextSize = 14
-        errLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
-        errLabel.TextXAlignment = Enum.TextXAlignment.Left
-        errLabel.TextYAlignment = Enum.TextYAlignment.Top
-        errLabel.TextWrapped = true
-        errLabel.Parent = errFrame
-        task.delay(10, function() errGui:Destroy() end)
+        local sg = Instance.new("ScreenGui")
+        sg.Name = "MomentumError"
+        sg.ResetOnSpawn = false
+        sg.IgnoreGuiInset = true
+        sg.DisplayOrder = 999
+        local ok2, pg = pcall(function()
+            return game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui", 10)
+        end)
+        sg.Parent = ok2 and pg or game:GetService("CoreGui")
+
+        local f = Instance.new("Frame")
+        f.Size = UDim2.new(0, 650, 0, 250)
+        f.Position = UDim2.new(0.5, -325, 0.5, -125)
+        f.BackgroundColor3 = Color3.fromRGB(15, 10, 10)
+        f.BorderSizePixel = 2
+        f.BorderColor3 = Color3.fromRGB(255, 50, 50)
+        f.Parent = sg
+        Instance.new("UICorner", f).CornerRadius = UDim.new(0, 8)
+
+        local t = Instance.new("TextLabel")
+        t.Size = UDim2.new(1, -20, 1, -20)
+        t.Position = UDim2.new(0, 10, 0, 10)
+        t.BackgroundTransparency = 1
+        t.Text = "MOMENTUM ERROR\n\n" .. tostring(err)
+        t.Font = Enum.Font.Code
+        t.TextSize = 13
+        t.TextColor3 = Color3.fromRGB(255, 80, 60)
+        t.TextXAlignment = Enum.TextXAlignment.Left
+        t.TextYAlignment = Enum.TextYAlignment.Top
+        t.TextWrapped = true
+        t.TextYAlignment = Enum.TextYAlignment.Top
+        t.Parent = f
+
+        local b = Instance.new("TextButton")
+        b.Size = UDim2.new(0, 80, 0, 24)
+        b.Position = UDim2.new(1, -90, 1, -34)
+        b.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+        b.Text = "CLOSE"
+        b.Font = Enum.Font.GothamBold
+        b.TextSize = 11
+        b.TextColor3 = Color3.new(1, 1, 1)
+        b.BorderSizePixel = 0
+        b.Parent = f
+        Instance.new("UICorner", b).CornerRadius = UDim.new(0, 5)
+        b.MouseButton1Click:Connect(function() sg:Destroy() end)
     end)
 end
