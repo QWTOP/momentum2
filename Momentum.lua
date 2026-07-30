@@ -285,6 +285,8 @@ local function destroyScript()
 
     stopFly()
     if flyConn then flyConn:Disconnect() flyConn = nil end
+    removeWings()
+    if wingConn then wingConn:Disconnect() wingConn = nil end
 
     local char = plr.Character
     if char then
@@ -1677,6 +1679,130 @@ chBtn.Parent = chCheck
 chBtn.MouseButton1Click:Connect(function()
     chamsEnabled = not chamsEnabled
     chFill.BackgroundColor3 = chamsEnabled and ACCENT or BG_HOVER
+end)
+
+-- ANGEL WINGS
+local wingsEnabled = false
+local wingsModel = nil
+
+local function buildWings()
+    removeWings()
+    local p = LP
+    if not p then return end
+    local char = p.Character
+    if not char then return end
+    local torso = char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
+    if not torso then return end
+
+    wingsModel = Instance.new("Model")
+    wingsModel.Name = "MomentumWings"
+
+    local colors = {ACCENT, Color3.fromRGB(200, 170, 255), Color3.fromRGB(255, 255, 255)}
+
+    for side = -1, 1, 2 do
+        for i = 1, 5 do
+            local w = Instance.new("WedgePart")
+            w.Size = Vector3.new(0.2, 2.8 - i * 0.45, 1.2 + i * 0.4)
+            w.Anchored = true
+            w.CanCollide = false
+            w.Material = Enum.Material.SmoothPlastic
+            w.Color = colors[math.min(i, #colors)]
+            w.BottomSurface = Enum.SurfaceType.Smooth
+            w.TopSurface = Enum.SurfaceType.Smooth
+            w.Parent = wingsModel
+        end
+    end
+
+    wingsModel.Parent = workspace
+end
+
+local function removeWings()
+    if wingsModel then
+        wingsModel:Destroy()
+        wingsModel = nil
+    end
+end
+
+local function updateWings()
+    if not wingsEnabled or not wingsModel then
+        if wingsModel then removeWings() end
+        return
+    end
+
+    local p = LP
+    if not p then return end
+    local char = p.Character
+    if not char then return end
+    local torso = char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
+    if not torso then return end
+
+    local parts = wingsModel:GetChildren()
+    local idx = 0
+    for side = -1, 1, 2 do
+        for i = 1, 5 do
+            idx = idx + 1
+            local w = parts[idx]
+            if w then
+                local rotX = math.rad(-25 + i * 12)
+                local rotY = math.rad(side * (50 - i * 10))
+                local rotZ = math.rad(side * (20 - i * 4))
+                local offset = Vector3.new(
+                    side * (1.0 + i * 0.6),
+                    0.6 - i * 0.2,
+                    -0.4 - i * 0.15
+                )
+                w.CFrame = torso.CFrame * CFrame.new(offset) * CFrame.Angles(rotX, rotY, rotZ)
+            end
+        end
+    end
+end
+
+local wingConn = RS.RenderStepped:Connect(function()
+    if scriptDestroyed then return end
+    updateWings()
+end)
+
+-- WINGS CHECKBOX
+local wCheck = Instance.new("Frame")
+wCheck.Size = UDim2.new(0, 16, 0, 16)
+wCheck.Position = UDim2.new(0, 15, 0, 105)
+wCheck.BackgroundColor3 = BG_LIGHT
+wCheck.BorderSizePixel = 0
+wCheck.Parent = visualTab
+addCorner(wCheck, 3)
+
+local wFill = Instance.new("Frame")
+wFill.Size = UDim2.new(1, -4, 1, -4)
+wFill.Position = UDim2.new(0, 2, 0, 2)
+wFill.BackgroundColor3 = BG_HOVER
+wFill.BorderSizePixel = 0
+wFill.Parent = wCheck
+
+local wLab = Instance.new("TextLabel")
+wLab.Size = UDim2.new(0, 140, 0, 16)
+wLab.Position = UDim2.new(0, 22, 0, 0)
+wLab.BackgroundTransparency = 1
+wLab.Text = "angel wings"
+wLab.Font = Enum.Font.GothamBold
+wLab.TextSize = 14
+wLab.TextColor3 = TXT_DIM
+wLab.TextXAlignment = Enum.TextXAlignment.Left
+wLab.Parent = wCheck
+
+local wBtn = Instance.new("TextButton")
+wBtn.Size = UDim2.new(1, 0, 1, 0)
+wBtn.BackgroundTransparency = 1
+wBtn.Text = ""
+wBtn.Parent = wCheck
+
+wBtn.MouseButton1Click:Connect(function()
+    wingsEnabled = not wingsEnabled
+    wFill.BackgroundColor3 = wingsEnabled and ACCENT or BG_HOVER
+    if wingsEnabled then
+        buildWings()
+    else
+        removeWings()
+    end
 end)
 
 -- WORLD TAB - SHADERS
