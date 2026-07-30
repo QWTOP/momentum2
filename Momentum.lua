@@ -1687,9 +1687,7 @@ local wingsModel = nil
 
 local function buildWings()
     removeWings()
-    local p = LP
-    if not p then return end
-    local char = p.Character
+    local char = plr.Character
     if not char then return end
     local torso = char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
     if not torso then return end
@@ -1729,9 +1727,7 @@ local function updateWings()
         return
     end
 
-    local p = LP
-    if not p then return end
-    local char = p.Character
+    local char = plr.Character
     if not char then return end
     local torso = char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
     if not torso then return end
