@@ -2334,40 +2334,90 @@ if not ok then
         end)
         sg.Parent = ok2 and pg or game:GetService("CoreGui")
 
+        local ACCENT = Color3.fromRGB(100, 70, 255)
+        local BG_DARK = Color3.fromRGB(12, 12, 22)
+        local BG_MID = Color3.fromRGB(18, 18, 32)
+        local TXT = Color3.fromRGB(200, 200, 220)
+        local DANGER = Color3.fromRGB(255, 60, 60)
+
+        local overlay = Instance.new("Frame")
+        overlay.Size = UDim2.new(1, 0, 1, 0)
+        overlay.BackgroundColor3 = Color3.new(0, 0, 0)
+        overlay.BackgroundTransparency = 0.5
+        overlay.BorderSizePixel = 0
+        overlay.Parent = sg
+
         local f = Instance.new("Frame")
-        f.Size = UDim2.new(0, 650, 0, 250)
-        f.Position = UDim2.new(0.5, -325, 0.5, -125)
-        f.BackgroundColor3 = Color3.fromRGB(15, 10, 10)
-        f.BorderSizePixel = 2
-        f.BorderColor3 = Color3.fromRGB(255, 50, 50)
+        f.Size = UDim2.new(0, 500, 0, 260)
+        f.Position = UDim2.new(0.5, -250, 0.5, -130)
+        f.BackgroundColor3 = BG_DARK
+        f.BorderSizePixel = 0
         f.Parent = sg
-        Instance.new("UICorner", f).CornerRadius = UDim.new(0, 8)
+        Instance.new("UICorner", f).CornerRadius = UDim.new(0, 10)
 
-        local t = Instance.new("TextLabel")
-        t.Size = UDim2.new(1, -20, 1, -20)
-        t.Position = UDim2.new(0, 10, 0, 10)
-        t.BackgroundTransparency = 1
-        t.Text = "MOMENTUM ERROR\n\n" .. tostring(err)
-        t.Font = Enum.Font.Code
-        t.TextSize = 13
-        t.TextColor3 = Color3.fromRGB(255, 80, 60)
-        t.TextXAlignment = Enum.TextXAlignment.Left
-        t.TextYAlignment = Enum.TextYAlignment.Top
-        t.TextWrapped = true
-        t.TextYAlignment = Enum.TextYAlignment.Top
-        t.Parent = f
+        local stroke = Instance.new("UIStroke")
+        stroke.Color = ACCENT
+        stroke.Thickness = 1
+        stroke.Transparency = 0.5
+        stroke.Parent = f
 
-        local b = Instance.new("TextButton")
-        b.Size = UDim2.new(0, 80, 0, 24)
-        b.Position = UDim2.new(1, -90, 1, -34)
-        b.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-        b.Text = "CLOSE"
-        b.Font = Enum.Font.GothamBold
-        b.TextSize = 11
-        b.TextColor3 = Color3.new(1, 1, 1)
-        b.BorderSizePixel = 0
-        b.Parent = f
-        Instance.new("UICorner", b).CornerRadius = UDim.new(0, 5)
-        b.MouseButton1Click:Connect(function() sg:Destroy() end)
+        local header = Instance.new("Frame")
+        header.Size = UDim2.new(1, 0, 0, 36)
+        header.BackgroundColor3 = BG_MID
+        header.BorderSizePixel = 0
+        header.Parent = f
+        Instance.new("UICorner", header).CornerRadius = UDim.new(0, 10)
+
+        local cover = Instance.new("Frame")
+        cover.Size = UDim2.new(1, 0, 0, 10)
+        cover.Position = UDim2.new(0, 0, 1, -10)
+        cover.BackgroundColor3 = BG_MID
+        cover.BorderSizePixel = 0
+        cover.Parent = header
+
+        local title = Instance.new("TextLabel")
+        title.Size = UDim2.new(1, 0, 1, 0)
+        title.BackgroundTransparency = 1
+        title.Text = "M O M E N T U M"
+        title.Font = Enum.Font.GothamBold
+        title.TextSize = 14
+        title.TextColor3 = DANGER
+        title.TextXAlignment = Enum.TextXAlignment.Center
+        title.TextYAlignment = Enum.TextYAlignment.Center
+        title.Parent = header
+
+        local line = Instance.new("Frame")
+        line.Size = UDim2.new(1, 0, 0, 2)
+        line.Position = UDim2.new(0, 0, 1, 0)
+        line.BorderSizePixel = 0
+        line.BackgroundColor3 = ACCENT
+        line.Parent = header
+
+        local errText = Instance.new("TextLabel")
+        errText.Size = UDim2.new(1, -30, 1, -90)
+        errText.Position = UDim2.new(0, 15, 0, 50)
+        errText.BackgroundTransparency = 1
+        errText.Text = tostring(err)
+        errText.Font = Enum.Font.Code
+        errText.TextSize = 13
+        errText.TextColor3 = DANGER
+        errText.TextXAlignment = Enum.TextXAlignment.Left
+        errText.TextYAlignment = Enum.TextYAlignment.Top
+        errText.TextWrapped = true
+        errText.Parent = f
+
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(0, 100, 0, 28)
+        btn.Position = UDim2.new(0.5, -50, 1, -40)
+        btn.BackgroundColor3 = DANGER
+        btn.Text = "CLOSE"
+        btn.Font = Enum.Font.GothamBold
+        btn.TextSize = 12
+        btn.TextColor3 = Color3.new(1, 1, 1)
+        btn.BorderSizePixel = 0
+        btn.Parent = f
+        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+
+        btn.MouseButton1Click:Connect(function() sg:Destroy() end)
     end)
 end
