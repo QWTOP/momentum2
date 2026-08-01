@@ -1728,33 +1728,15 @@ local function buildWings()
     wingsModel = Instance.new("Model")
     wingsModel.Name = "MomentumWings"
 
-    local featherCount = 6
-    local featherSizes = {
-        Vector3.new(0.15, 2.8, 2.0),
-        Vector3.new(0.15, 2.4, 1.8),
-        Vector3.new(0.15, 2.0, 1.6),
-        Vector3.new(0.15, 1.6, 1.3),
-        Vector3.new(0.15, 1.2, 1.0),
-        Vector3.new(0.15, 0.8, 0.7),
-    }
-    local featherColors = {
-        Color3.fromRGB(180, 130, 255),
-        Color3.fromRGB(160, 110, 255),
-        Color3.fromRGB(200, 170, 255),
-        Color3.fromRGB(220, 200, 255),
-        Color3.fromRGB(190, 160, 255),
-        Color3.fromRGB(170, 120, 255),
-    }
-
     for side = -1, 1, 2 do
-        for i = 1, featherCount do
-            local w = Instance.new("WedgePart")
-            w.Size = featherSizes[i]
+        for i = 1, 5 do
+            local w = Instance.new("Part")
+            w.Size = Vector3.new(2.0 - i * 0.2, 2.5 - i * 0.35, 0.06)
             w.Anchored = true
             w.CanCollide = false
             w.Material = Enum.Material.Neon
-            w.Color = featherColors[i]
-            w.Transparency = 0.35
+            w.Color = Color3.fromRGB(150 + i * 15, 80 + i * 10, 255)
+            w.Transparency = 0.55
             w.CastShadow = false
             w.BottomSurface = Enum.SurfaceType.Smooth
             w.TopSurface = Enum.SurfaceType.Smooth
@@ -1780,19 +1762,22 @@ local function updateWings()
     local time = tick()
 
     for idx, w in ipairs(parts) do
-        local side = idx <= 6 and -1 or 1
-        local i = idx <= 6 and idx or (idx - 6)
+        local side = idx <= 5 and -1 or 1
+        local i = idx <= 5 and idx or (idx - 5)
 
-        local fanAngle = math.rad(side * (25 + i * 10))
-        local liftAngle = math.rad(-15 + i * 8)
-        local tiltAngle = math.rad(side * 12)
+        local breathe = math.sin(time * 1.5 + i * 0.4) * 0.06
 
-        local breathe = math.sin(time * 2 + i * 0.3) * 0.05
-        local dist = 1.2 + i * 0.35 + breathe
+        local fanAngle = math.rad(side * (15 + i * 12))
+        local liftAngle = math.rad(-5 + i * 10)
+        local tiltAngle = math.rad(side * 8 + breathe * 40)
+
+        local dist = 1.0 + i * 0.55 + breathe
+        local yOff = 0.2 + i * 0.35
 
         w.CFrame = torso.CFrame
-            * CFrame.new(Vector3.new(side * 0.3, 0.3 + i * 0.25, -0.2))
-            * CFrame.Angles(liftAngle, fanAngle, tiltAngle)
+            * CFrame.new(Vector3.new(side * 0.4, yOff, -0.15))
+            * CFrame.Angles(0, fanAngle, 0)
+            * CFrame.Angles(liftAngle, 0, tiltAngle)
             * CFrame.new(side * dist, 0, 0)
     end
 end
