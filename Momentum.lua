@@ -1711,6 +1711,13 @@ end)
 local wingsEnabled = false
 local wingsModel = nil
 
+local function removeWings()
+    if wingsModel then
+        wingsModel:Destroy()
+        wingsModel = nil
+    end
+end
+
 local function buildWings()
     removeWings()
     local char = plr.Character
@@ -1738,13 +1745,6 @@ local function buildWings()
     end
 
     wingsModel.Parent = workspace
-end
-
-local function removeWings()
-    if wingsModel then
-        wingsModel:Destroy()
-        wingsModel = nil
-    end
 end
 
 local function updateWings()
