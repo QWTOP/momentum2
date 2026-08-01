@@ -76,7 +76,7 @@ wordFrame.Position = UDim2.new(0.5, -TOTAL_WIDTH / 2, 0.5, -(TEXT_SIZE + 20) / 2
 wordFrame.BackgroundTransparency = 1
 wordFrame.Parent = sg
 
--- "M" — purple accent
+-- "M" � purple accent
 local mLabel = Instance.new("TextLabel")
 mLabel.Size = UDim2.new(0, 100, 1, 0)
 mLabel.Position = UDim2.new(0, 0, 0, 0)
@@ -90,7 +90,7 @@ mLabel.TextXAlignment = Enum.TextXAlignment.Center
 mLabel.TextYAlignment = Enum.TextYAlignment.Center
 mLabel.Parent = wordFrame
 
--- "OMENTUM" — lighter
+-- "OMENTUM" � lighter
 local oLabel = Instance.new("TextLabel")
 oLabel.Size = UDim2.new(0, 500, 1, 0)
 oLabel.Position = UDim2.new(0, 100, 0, 60)
@@ -387,16 +387,6 @@ local function hideAllTabs()
     visualTab.Visible = false
 end
 
-local function setActiveTab(btn)
-    mainTabBtn.BackgroundColor3 = BG_LIGHT
-    worldTabBtn.BackgroundColor3 = BG_LIGHT
-    visualTabBtn.BackgroundColor3 = BG_LIGHT
-    mainTabBtn.TextColor3 = TXT_DIM
-    worldTabBtn.TextColor3 = TXT_DIM
-    visualTabBtn.TextColor3 = TXT_DIM
-    tweenProp(btn, {BackgroundColor3 = ACCENT, TextColor3 = TXT_BRIGHT}, 0.2)
-end
-
 local tabBtnStyle = {Font = Enum.Font.GothamBold, TextSize = 13, BorderSizePixel = 0}
 
 local mainTabBtn = Instance.new("TextButton")
@@ -428,6 +418,16 @@ visualTabBtn.TextColor3 = TXT_DIM
 visualTabBtn.Parent = tabBar
 for k, v in pairs(tabBtnStyle) do visualTabBtn[k] = v end
 addCorner(visualTabBtn, 5)
+
+local function setActiveTab(btn)
+    mainTabBtn.BackgroundColor3 = BG_LIGHT
+    worldTabBtn.BackgroundColor3 = BG_LIGHT
+    visualTabBtn.BackgroundColor3 = BG_LIGHT
+    mainTabBtn.TextColor3 = TXT_DIM
+    worldTabBtn.TextColor3 = TXT_DIM
+    visualTabBtn.TextColor3 = TXT_DIM
+    tweenProp(btn, {BackgroundColor3 = ACCENT, TextColor3 = TXT_BRIGHT}, 0.2)
+end
 
 for _, btn in ipairs({mainTabBtn, worldTabBtn, visualTabBtn}) do
     btn.MouseEnter:Connect(function()
