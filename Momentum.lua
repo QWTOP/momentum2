@@ -76,7 +76,7 @@ wordFrame.Position = UDim2.new(0.5, -TOTAL_WIDTH / 2, 0.5, -(TEXT_SIZE + 20) / 2
 wordFrame.BackgroundTransparency = 1
 wordFrame.Parent = sg
 
--- "M" пїЅ purple accent
+-- "M" � purple accent
 local mLabel = Instance.new("TextLabel")
 mLabel.Size = UDim2.new(0, 100, 1, 0)
 mLabel.Position = UDim2.new(0, 0, 0, 0)
@@ -90,7 +90,7 @@ mLabel.TextXAlignment = Enum.TextXAlignment.Center
 mLabel.TextYAlignment = Enum.TextYAlignment.Center
 mLabel.Parent = wordFrame
 
--- "OMENTUM" пїЅ lighter
+-- "OMENTUM" � lighter
 local oLabel = Instance.new("TextLabel")
 oLabel.Size = UDim2.new(0, 500, 1, 0)
 oLabel.Position = UDim2.new(0, 100, 0, 60)
