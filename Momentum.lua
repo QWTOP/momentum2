@@ -1731,12 +1731,12 @@ local function buildWings()
     for side = -1, 1, 2 do
         for i = 1, 5 do
             local w = Instance.new("Part")
-            w.Size = Vector3.new(2.0 - i * 0.2, 2.5 - i * 0.35, 0.06)
+            w.Size = Vector3.new(1.8 - i * 0.15, 2.8 - i * 0.4, 0.05)
             w.Anchored = true
             w.CanCollide = false
             w.Material = Enum.Material.Neon
-            w.Color = Color3.fromRGB(150 + i * 15, 80 + i * 10, 255)
-            w.Transparency = 0.55
+            w.Color = Color3.fromRGB(160 + i * 10, 100 + i * 10, 255)
+            w.Transparency = 0.5
             w.CastShadow = false
             w.BottomSurface = Enum.SurfaceType.Smooth
             w.TopSurface = Enum.SurfaceType.Smooth
@@ -1765,20 +1765,17 @@ local function updateWings()
         local side = idx <= 5 and -1 or 1
         local i = idx <= 5 and idx or (idx - 5)
 
-        local breathe = math.sin(time * 1.5 + i * 0.4) * 0.06
+        local breathe = math.sin(time * 1.5 + i * 0.3) * 0.04
 
-        local fanAngle = math.rad(side * (15 + i * 12))
-        local liftAngle = math.rad(-5 + i * 10)
-        local tiltAngle = math.rad(side * 8 + breathe * 40)
-
-        local dist = 1.0 + i * 0.55 + breathe
-        local yOff = 0.2 + i * 0.35
+        local spreadAngle = math.rad(side * (20 + i * 14))
+        local liftAngle = math.rad(-8 + i * 12 + breathe * 30)
+        local rollAngle = math.rad(side * 15)
 
         w.CFrame = torso.CFrame
-            * CFrame.new(Vector3.new(side * 0.4, yOff, -0.15))
-            * CFrame.Angles(0, fanAngle, 0)
-            * CFrame.Angles(liftAngle, 0, tiltAngle)
-            * CFrame.new(side * dist, 0, 0)
+            * CFrame.new(Vector3.new(side * 0.2, 0.1 + i * 0.15, -0.6))
+            * CFrame.Angles(0, spreadAngle, 0)
+            * CFrame.Angles(liftAngle, 0, rollAngle)
+            * CFrame.new(side * (0.8 + i * 0.5), 0, 0)
     end
 end
 
