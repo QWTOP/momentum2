@@ -21,32 +21,17 @@ Instance.new("UICorner", t).CornerRadius = UDim.new(0, 6)
 task.delay(8, function() pcall(function() sg:Destroy() end) end)
 end)
 
-local ok, err = pcall(function()
-
-local UIS = game:GetService("UserInputService")
+-- SPLASH (outside pcall, safe to yield)
+do
 local TS = game:GetService("TweenService")
 local plr = game:GetService("Players").LocalPlayer
 local parent = plr:WaitForChild("PlayerGui")
-
-local KEYBD = Enum.UserInputType.Keyboard.Value
-local scriptDestroyed = false
-local allConns = {}
-
-local function track(c)
-    table.insert(allConns, c)
-    return c
-end
-
-local function getTypeValue(inp)
-    local ok, v = pcall(function() return inp.UserInputType.Value end)
-    return ok and v or -1
-end
-
--- SPLASH
 local SPLASH_ACCENT = Color3.fromRGB(100, 70, 255)
 local SPLASH_DIM = Color3.fromRGB(65, 45, 160)
 local SPLASH_BG = Color3.fromRGB(12, 12, 22)
 local SPLASH_TXT = Color3.fromRGB(200, 200, 220)
+local TEXT_SIZE = 80
+local TOTAL_WIDTH = 600
 
 local sg = Instance.new("ScreenGui")
 sg.Name = "MomentumSplash"
@@ -55,7 +40,6 @@ sg.IgnoreGuiInset = true
 sg.DisplayOrder = 999
 sg.Parent = parent
 
--- dark overlay
 local overlay = Instance.new("Frame")
 overlay.Size = UDim2.new(1, 0, 1, 0)
 overlay.BackgroundColor3 = SPLASH_BG
@@ -67,16 +51,12 @@ local blur = Instance.new("BlurEffect")
 blur.Size = 0
 blur.Parent = game:GetService("Lighting")
 
-local TEXT_SIZE = 80
-local TOTAL_WIDTH = 600
-
 local wordFrame = Instance.new("Frame")
 wordFrame.Size = UDim2.new(0, TOTAL_WIDTH, 0, TEXT_SIZE + 20)
 wordFrame.Position = UDim2.new(0.5, -TOTAL_WIDTH / 2, 0.5, -(TEXT_SIZE + 20) / 2)
 wordFrame.BackgroundTransparency = 1
 wordFrame.Parent = sg
 
--- "M" � purple accent
 local mLabel = Instance.new("TextLabel")
 mLabel.Size = UDim2.new(0, 100, 1, 0)
 mLabel.Position = UDim2.new(0, 0, 0, 0)
@@ -90,7 +70,6 @@ mLabel.TextXAlignment = Enum.TextXAlignment.Center
 mLabel.TextYAlignment = Enum.TextYAlignment.Center
 mLabel.Parent = wordFrame
 
--- "OMENTUM" � lighter
 local oLabel = Instance.new("TextLabel")
 oLabel.Size = UDim2.new(0, 500, 1, 0)
 oLabel.Position = UDim2.new(0, 100, 0, 60)
@@ -104,7 +83,6 @@ oLabel.TextXAlignment = Enum.TextXAlignment.Left
 oLabel.TextYAlignment = Enum.TextYAlignment.Center
 oLabel.Parent = wordFrame
 
--- accent line under text
 local accentLine = Instance.new("Frame")
 accentLine.Size = UDim2.new(0, 0, 0, 2)
 accentLine.Position = UDim2.new(0.5, 0, 0.5, TEXT_SIZE / 2 + 8)
@@ -114,11 +92,6 @@ accentLine.BorderSizePixel = 0
 accentLine.BackgroundTransparency = 1
 accentLine.Parent = sg
 
-local lineGradient = Instance.new("UIGradient")
-lineGradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, SPLASH_BG), ColorSequenceKeypoint.new(0.3, SPLASH_DIM), ColorSequenceKeypoint.new(0.5, SPLASH_ACCENT), ColorSequenceKeypoint.new(0.7, SPLASH_DIM), ColorSequenceKeypoint.new(1, SPLASH_BG)})
-lineGradient.Parent = accentLine
-
--- credit
 local creditLab = Instance.new("TextLabel")
 creditLab.Size = UDim2.new(1, 0, 0, 18)
 creditLab.Position = UDim2.new(0.5, 0, 0.5, TEXT_SIZE / 2 + 18)
@@ -132,8 +105,6 @@ creditLab.TextXAlignment = Enum.TextXAlignment.Center
 creditLab.TextYAlignment = Enum.TextYAlignment.Center
 creditLab.Parent = sg
 
--- === ANIMATION (runs async so pcall doesn't yield) ===
-task.spawn(function()
 TS:Create(overlay, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundTransparency = 0.15}):Play()
 TS:Create(blur, TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = 16}):Play()
 TS:Create(mLabel, TweenInfo.new(1.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
@@ -153,21 +124,19 @@ for _, b in ipairs(game:GetService("Lighting"):GetChildren()) do
     if b:IsA("BlurEffect") then b:Destroy() end
 end
 sg:Destroy()
-end)
+end
 
--- MENU
-local ACCENT = Color3.fromRGB(100, 70, 255)
-local ACCENT_DIM = Color3.fromRGB(65, 45, 160)
-local ACCENT_GLOW = Color3.fromRGB(130, 100, 255)
-local BG_DARK = Color3.fromRGB(12, 12, 22)
-local BG_MID = Color3.fromRGB(18, 18, 32)
-local BG_LIGHT = Color3.fromRGB(28, 28, 48)
-local BG_HOVER = Color3.fromRGB(38, 38, 60)
-local TXT = Color3.fromRGB(200, 200, 220)
-local TXT_DIM = Color3.fromRGB(110, 110, 140)
-local TXT_BRIGHT = Color3.fromRGB(255, 255, 255)
-local DANGER = Color3.fromRGB(180, 50, 60)
-local DANGER_HVR = Color3.fromRGB(220, 65, 75)
+-- MENU (inside pcall for error display)
+local ok, err = pcall(function()
+
+local UIS = game:GetService("UserInputService")
+local TS = game:GetService("TweenService")
+local plr = game:GetService("Players").LocalPlayer
+local parent = plr:WaitForChild("PlayerGui")
+
+local KEYBD = Enum.UserInputType.Keyboard.Value
+local scriptDestroyed = false
+local allConns = {}
 
 local function addCorner(parent, r)
     local c = Instance.new("UICorner")
