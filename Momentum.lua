@@ -1728,18 +1728,51 @@ local function buildWings()
     wingsModel = Instance.new("Model")
     wingsModel.Name = "MomentumWings"
 
-    local colors = {ACCENT, Color3.fromRGB(200, 170, 255), Color3.fromRGB(255, 255, 255)}
+    local wingData = {
+        {size = Vector3.new(0.08, 3.2, 1.8), offset = Vector3.new(0, 0.3, 0), angles = Vector3.new(0, 0, 0)},
+        {size = Vector3.new(0.08, 2.8, 1.5), offset = Vector3.new(0, 0.6, 0.15), angles = Vector3.new(0, 0, 0)},
+        {size = Vector3.new(0.08, 2.2, 1.2), offset = Vector3.new(0, 0.9, 0.25), angles = Vector3.new(0, 0, 0)},
+        {size = Vector3.new(0.08, 1.5, 0.9), offset = Vector3.new(0, 1.1, 0.3), angles = Vector3.new(0, 0, 0)},
+        {size = Vector3.new(0.08, 0.8, 0.6), offset = Vector3.new(0, 1.3, 0.35), angles = Vector3.new(0, 0, 0)},
+    }
 
     for side = -1, 1, 2 do
-        for i = 1, 5 do
-            local w = Instance.new("WedgePart")
-            w.Size = Vector3.new(0.2, 2.8 - i * 0.45, 1.2 + i * 0.4)
+        for i, data in ipairs(wingData) do
+            local w = Instance.new("Part")
+            w.Size = data.size
             w.Anchored = true
             w.CanCollide = false
-            w.Material = Enum.Material.SmoothPlastic
-            w.Color = colors[math.min(i, #colors)]
+            w.Material = Enum.Material.Neon
+            w.Color = Color3.fromRGB(130 + i * 20, 70 + i * 15, 255)
+            w.Transparency = 0.3
+            w.CastShadow = false
             w.BottomSurface = Enum.SurfaceType.Smooth
             w.TopSurface = Enum.SurfaceType.Smooth
+
+            local ang = Instance.new("SurfaceGui")
+            ang.Face = Enum.NormalId.Front
+            ang.LightInfluence = 0
+            ang.Parent = w
+
+            local grad = Instance.new("UIGradient")
+            grad.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(160, 100, 255)),
+                ColorSequenceKeypoint.new(0.5, Color3.fromRGB(200, 170, 255)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(130, 70, 255))
+            })
+            grad.Rotation = 90
+            grad.Parent = ang
+
+            local spineAngle = math.rad(side * (8 + i * 5))
+            local spreadAngle = math.rad(side * (30 + i * 8))
+            local liftAngle = math.rad(-5 + i * 3)
+
+            w.CFrame = torso.CFrame * CFrame.new(Vector3.new(
+                side * (0.4 + i * 0.5),
+                data.offset.Y,
+                -0.3 - i * 0.12
+            )) * CFrame.Angles(liftAngle, spineAngle, spreadAngle)
+
             w.Parent = wingsModel
         end
     end
@@ -1765,15 +1798,15 @@ local function updateWings()
             idx = idx + 1
             local w = parts[idx]
             if w then
-                local rotX = math.rad(-25 + i * 12)
-                local rotY = math.rad(side * (50 - i * 10))
-                local rotZ = math.rad(side * (20 - i * 4))
-                local offset = Vector3.new(
-                    side * (1.0 + i * 0.6),
-                    0.6 - i * 0.2,
-                    -0.4 - i * 0.15
-                )
-                w.CFrame = torso.CFrame * CFrame.new(offset) * CFrame.Angles(rotX, rotY, rotZ)
+                local spineAngle = math.rad(side * (8 + i * 5))
+                local spreadAngle = math.rad(side * (30 + i * 8))
+                local liftAngle = math.rad(-5 + i * 3)
+
+                w.CFrame = torso.CFrame * CFrame.new(Vector3.new(
+                    side * (0.4 + i * 0.5),
+                    0.3 + i * 0.3,
+                    -0.3 - i * 0.12
+                )) * CFrame.Angles(liftAngle, spineAngle, spreadAngle)
             end
         end
     end
