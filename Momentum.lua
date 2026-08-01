@@ -1722,21 +1722,22 @@ local function buildWings()
     removeWings()
     local char = plr.Character
     if not char then return end
-    local torso = char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
-    if not torso then return end
 
     wingsModel = Instance.new("Model")
     wingsModel.Name = "MomentumWings"
 
+    local featherW = {3.0, 2.6, 2.2, 1.8, 1.4, 1.0}
+    local featherH = {2.0, 1.8, 1.6, 1.3, 1.0, 0.7}
+
     for side = -1, 1, 2 do
-        for i = 1, 5 do
-            local w = Instance.new("Part")
-            w.Size = Vector3.new(1.8 - i * 0.15, 2.8 - i * 0.4, 0.05)
+        for i = 1, 6 do
+            local w = Instance.new("WedgePart")
+            w.Size = Vector3.new(0.08, featherH[i], featherW[i])
             w.Anchored = true
             w.CanCollide = false
             w.Material = Enum.Material.Neon
-            w.Color = Color3.fromRGB(160 + i * 10, 100 + i * 10, 255)
-            w.Transparency = 0.5
+            w.Color = Color3.fromRGB(140 + i * 12, 80 + i * 8, 255)
+            w.Transparency = 0.4
             w.CastShadow = false
             w.BottomSurface = Enum.SurfaceType.Smooth
             w.TopSurface = Enum.SurfaceType.Smooth
@@ -1755,27 +1756,38 @@ local function updateWings()
 
     local char = plr.Character
     if not char then return end
-    local torso = char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso")
+    local torso = char:FindFirstChild("HumanoidRootPart")
     if not torso then return end
 
     local parts = wingsModel:GetChildren()
-    local time = tick()
+    local t = tick()
+    local cf = torso.CFrame
+
+    local right = cf.RightVector
+    local up = cf.UpVector
+    local back = -cf.LookVector
+
+    local spine = cf.Position + up * 0.4 + back * 0.5
 
     for idx, w in ipairs(parts) do
-        local side = idx <= 5 and -1 or 1
-        local i = idx <= 5 and idx or (idx - 5)
+        local side = idx <= 6 and -1 or 1
+        local i = idx <= 6 and idx or (idx - 6)
 
-        local breathe = math.sin(time * 1.5 + i * 0.3) * 0.04
+        local breathe = math.sin(t * 1.8 + i * 0.35) * 0.05
+        local spreadDist = 1.0 + i * 0.55 + breathe
+        local spreadAngle = math.rad(15 + i * 13 + breathe * 20)
+        local lift = -0.2 + i * 0.38
 
-        local spreadAngle = math.rad(side * (20 + i * 14))
-        local liftAngle = math.rad(-8 + i * 12 + breathe * 30)
-        local rollAngle = math.rad(side * 15)
+        local dir = (right * side * math.cos(spreadAngle) + up * math.sin(spreadAngle)).Unit
 
-        w.CFrame = torso.CFrame
-            * CFrame.new(Vector3.new(side * 0.2, 0.1 + i * 0.15, -0.6))
-            * CFrame.Angles(0, spreadAngle, 0)
-            * CFrame.Angles(liftAngle, 0, rollAngle)
-            * CFrame.new(side * (0.8 + i * 0.5), 0, 0)
+        local pos = spine + dir * spreadDist + up * lift
+
+        local lookDir = (pos - spine).Unit
+        local wingUp = up
+        local wingRight = lookDir:Cross(wingUp).Unit
+
+        w.CFrame = CFrame.fromMatrix(pos, wingRight, wingUp, -lookDir)
+            * CFrame.Angles(math.rad(side * 10), 0, 0)
     end
 end
 
