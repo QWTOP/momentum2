@@ -138,6 +138,16 @@ local KEYBD = Enum.UserInputType.Keyboard.Value
 local scriptDestroyed = false
 local allConns = {}
 
+local function track(c)
+    table.insert(allConns, c)
+    return c
+end
+
+local function getTypeValue(inp)
+    local ok, v = pcall(function() return inp.UserInputType.Value end)
+    return ok and v or -1
+end
+
 local ACCENT = Color3.fromRGB(100, 70, 255)
 local ACCENT_DIM = Color3.fromRGB(65, 45, 160)
 local ACCENT_GLOW = Color3.fromRGB(130, 100, 255)
