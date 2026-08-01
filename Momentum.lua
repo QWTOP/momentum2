@@ -138,6 +138,19 @@ local KEYBD = Enum.UserInputType.Keyboard.Value
 local scriptDestroyed = false
 local allConns = {}
 
+local ACCENT = Color3.fromRGB(100, 70, 255)
+local ACCENT_DIM = Color3.fromRGB(65, 45, 160)
+local ACCENT_GLOW = Color3.fromRGB(130, 100, 255)
+local BG_DARK = Color3.fromRGB(12, 12, 22)
+local BG_MID = Color3.fromRGB(18, 18, 32)
+local BG_LIGHT = Color3.fromRGB(28, 28, 48)
+local BG_HOVER = Color3.fromRGB(38, 38, 60)
+local TXT = Color3.fromRGB(200, 200, 220)
+local TXT_DIM = Color3.fromRGB(110, 110, 140)
+local TXT_BRIGHT = Color3.fromRGB(255, 255, 255)
+local DANGER = Color3.fromRGB(180, 50, 60)
+local DANGER_HVR = Color3.fromRGB(220, 65, 75)
+
 local function addCorner(parent, r)
     local c = Instance.new("UICorner")
     c.CornerRadius = UDim.new(0, r or 6)
