@@ -1728,51 +1728,36 @@ local function buildWings()
     wingsModel = Instance.new("Model")
     wingsModel.Name = "MomentumWings"
 
-    local wingData = {
-        {size = Vector3.new(0.08, 3.2, 1.8), offset = Vector3.new(0, 0.3, 0), angles = Vector3.new(0, 0, 0)},
-        {size = Vector3.new(0.08, 2.8, 1.5), offset = Vector3.new(0, 0.6, 0.15), angles = Vector3.new(0, 0, 0)},
-        {size = Vector3.new(0.08, 2.2, 1.2), offset = Vector3.new(0, 0.9, 0.25), angles = Vector3.new(0, 0, 0)},
-        {size = Vector3.new(0.08, 1.5, 0.9), offset = Vector3.new(0, 1.1, 0.3), angles = Vector3.new(0, 0, 0)},
-        {size = Vector3.new(0.08, 0.8, 0.6), offset = Vector3.new(0, 1.3, 0.35), angles = Vector3.new(0, 0, 0)},
+    local featherCount = 6
+    local featherSizes = {
+        Vector3.new(0.15, 2.8, 2.0),
+        Vector3.new(0.15, 2.4, 1.8),
+        Vector3.new(0.15, 2.0, 1.6),
+        Vector3.new(0.15, 1.6, 1.3),
+        Vector3.new(0.15, 1.2, 1.0),
+        Vector3.new(0.15, 0.8, 0.7),
+    }
+    local featherColors = {
+        Color3.fromRGB(180, 130, 255),
+        Color3.fromRGB(160, 110, 255),
+        Color3.fromRGB(200, 170, 255),
+        Color3.fromRGB(220, 200, 255),
+        Color3.fromRGB(190, 160, 255),
+        Color3.fromRGB(170, 120, 255),
     }
 
     for side = -1, 1, 2 do
-        for i, data in ipairs(wingData) do
-            local w = Instance.new("Part")
-            w.Size = data.size
+        for i = 1, featherCount do
+            local w = Instance.new("WedgePart")
+            w.Size = featherSizes[i]
             w.Anchored = true
             w.CanCollide = false
             w.Material = Enum.Material.Neon
-            w.Color = Color3.fromRGB(130 + i * 20, 70 + i * 15, 255)
-            w.Transparency = 0.3
+            w.Color = featherColors[i]
+            w.Transparency = 0.35
             w.CastShadow = false
             w.BottomSurface = Enum.SurfaceType.Smooth
             w.TopSurface = Enum.SurfaceType.Smooth
-
-            local ang = Instance.new("SurfaceGui")
-            ang.Face = Enum.NormalId.Front
-            ang.LightInfluence = 0
-            ang.Parent = w
-
-            local grad = Instance.new("UIGradient")
-            grad.Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, Color3.fromRGB(160, 100, 255)),
-                ColorSequenceKeypoint.new(0.5, Color3.fromRGB(200, 170, 255)),
-                ColorSequenceKeypoint.new(1, Color3.fromRGB(130, 70, 255))
-            })
-            grad.Rotation = 90
-            grad.Parent = ang
-
-            local spineAngle = math.rad(side * (8 + i * 5))
-            local spreadAngle = math.rad(side * (30 + i * 8))
-            local liftAngle = math.rad(-5 + i * 3)
-
-            w.CFrame = torso.CFrame * CFrame.new(Vector3.new(
-                side * (0.4 + i * 0.5),
-                data.offset.Y,
-                -0.3 - i * 0.12
-            )) * CFrame.Angles(liftAngle, spineAngle, spreadAngle)
-
             w.Parent = wingsModel
         end
     end
@@ -1792,23 +1777,23 @@ local function updateWings()
     if not torso then return end
 
     local parts = wingsModel:GetChildren()
-    local idx = 0
-    for side = -1, 1, 2 do
-        for i = 1, 5 do
-            idx = idx + 1
-            local w = parts[idx]
-            if w then
-                local spineAngle = math.rad(side * (8 + i * 5))
-                local spreadAngle = math.rad(side * (30 + i * 8))
-                local liftAngle = math.rad(-5 + i * 3)
+    local time = tick()
 
-                w.CFrame = torso.CFrame * CFrame.new(Vector3.new(
-                    side * (0.4 + i * 0.5),
-                    0.3 + i * 0.3,
-                    -0.3 - i * 0.12
-                )) * CFrame.Angles(liftAngle, spineAngle, spreadAngle)
-            end
-        end
+    for idx, w in ipairs(parts) do
+        local side = idx <= 6 and -1 or 1
+        local i = idx <= 6 and idx or (idx - 6)
+
+        local fanAngle = math.rad(side * (25 + i * 10))
+        local liftAngle = math.rad(-15 + i * 8)
+        local tiltAngle = math.rad(side * 12)
+
+        local breathe = math.sin(time * 2 + i * 0.3) * 0.05
+        local dist = 1.2 + i * 0.35 + breathe
+
+        w.CFrame = torso.CFrame
+            * CFrame.new(Vector3.new(side * 0.3, 0.3 + i * 0.25, -0.2))
+            * CFrame.Angles(liftAngle, fanAngle, tiltAngle)
+            * CFrame.new(side * dist, 0, 0)
     end
 end
 
