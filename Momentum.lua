@@ -132,42 +132,28 @@ creditLab.TextXAlignment = Enum.TextXAlignment.Center
 creditLab.TextYAlignment = Enum.TextYAlignment.Center
 creditLab.Parent = sg
 
--- === ANIMATION ===
-
--- fade in overlay
+-- === ANIMATION (runs async so pcall doesn't yield) ===
+task.spawn(function()
 TS:Create(overlay, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundTransparency = 0.15}):Play()
 TS:Create(blur, TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = 16}):Play()
-
--- "M" fades in
 TS:Create(mLabel, TweenInfo.new(1.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
-
 task.wait(0.8)
-
--- "OMENTUM" slides up + fades in
 TS:Create(oLabel, TweenInfo.new(0.7, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0, Position = UDim2.new(0, 100, 0, 0)}):Play()
-
--- accent line expands
 TS:Create(accentLine, TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0.3), {Size = UDim2.new(0, 300, 0, 2), BackgroundTransparency = 0}):Play()
-
--- credit fades in
 TS:Create(creditLab, TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0.4), {TextTransparency = 0.3}):Play()
-
 task.wait(2.2)
-
--- === FADE OUT ===
 TS:Create(blur, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Size = 0}):Play()
 TS:Create(overlay, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {BackgroundTransparency = 1}):Play()
 TS:Create(mLabel, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {TextTransparency = 1}):Play()
 TS:Create(oLabel, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {TextTransparency = 1}):Play()
 TS:Create(accentLine, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {BackgroundTransparency = 1}):Play()
 TS:Create(creditLab, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {TextTransparency = 1}):Play()
-
 task.wait(0.6)
 for _, b in ipairs(game:GetService("Lighting"):GetChildren()) do
     if b:IsA("BlurEffect") then b:Destroy() end
 end
 sg:Destroy()
-task.wait(0.3)
+end)
 
 -- MENU
 local ACCENT = Color3.fromRGB(100, 70, 255)
