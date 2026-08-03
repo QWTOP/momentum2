@@ -288,7 +288,6 @@ local function destroyScript()
     if flyConn then flyConn:Disconnect() flyConn = nil end
     removeWings()
     if wingConn then wingConn:Disconnect() wingConn = nil end
-
     pcall(function()
         for _, c in pairs(activeClones) do
             if c and c.Parent then c:Destroy() end
@@ -2416,157 +2415,89 @@ end)
 if not ok then
     local errStr = tostring(err)
     pcall(function()
-        local TS2 = game:GetService("TweenService")
-        local plr2 = game:GetService("Players").LocalPlayer
-        local par2 = nil
-        pcall(function() par2 = plr2:WaitForChild("PlayerGui", 10) end)
-        if not par2 then pcall(function() par2 = game:GetService("CoreGui") end) end
-        if not par2 then warn("[Momentum Error] " .. errStr) return end
-
         local sg = Instance.new("ScreenGui")
         sg.Name = "MomentumError"
         sg.ResetOnSpawn = false
         sg.IgnoreGuiInset = true
-        sg.DisplayOrder = 9999
-        sg.Parent = par2
+        sg.DisplayOrder = 999
+        local ok2, pg = pcall(function()
+            return game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui", 10)
+        end)
+        pcall(function() sg.Parent = ok2 and pg or game:GetService("CoreGui") end)
+        if not sg.Parent then return end
 
         local overlay = Instance.new("Frame")
         overlay.Size = UDim2.new(1, 0, 1, 0)
         overlay.BackgroundColor3 = Color3.new(0, 0, 0)
-        overlay.BackgroundTransparency = 1
+        overlay.BackgroundTransparency = 0.5
         overlay.BorderSizePixel = 0
         overlay.Parent = sg
-        TS2:Create(overlay, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundTransparency = 0.4}):Play()
 
         local f = Instance.new("Frame")
-        f.Size = UDim2.new(0, 500, 0, 260)
-        f.Position = UDim2.new(0.5, -250, 0.5, -130)
+        f.Size = UDim2.new(0, 450, 0, 220)
+        f.Position = UDim2.new(0.5, -225, 0.5, -110)
         f.BackgroundColor3 = Color3.fromRGB(12, 12, 22)
         f.BorderSizePixel = 0
         f.Parent = sg
-        f.ClipsDescendants = true
         Instance.new("UICorner", f).CornerRadius = UDim.new(0, 10)
-        local stroke = Instance.new("UIStroke", f)
-        stroke.Color = Color3.fromRGB(255, 60, 60)
-        stroke.Thickness = 1
 
         local header = Instance.new("Frame")
-        header.Size = UDim2.new(1, 0, 0, 36)
+        header.Size = UDim2.new(1, 0, 0, 32)
         header.BackgroundColor3 = Color3.fromRGB(18, 18, 32)
         header.BorderSizePixel = 0
         header.Parent = f
         Instance.new("UICorner", header).CornerRadius = UDim.new(0, 10)
-        local hCover = Instance.new("Frame")
-        hCover.Size = UDim2.new(1, 0, 0, 12)
-        hCover.Position = UDim2.new(0, 0, 1, -12)
-        hCover.BackgroundColor3 = Color3.fromRGB(18, 18, 32)
-        hCover.BorderSizePixel = 0
-        hCover.Parent = header
 
-        local icon = Instance.new("TextLabel")
-        icon.Size = UDim2.new(0, 30, 1, 0)
-        icon.Position = UDim2.new(0, 10, 0, 0)
-        icon.BackgroundTransparency = 1
-        icon.Text = "!"
-        icon.Font = Enum.Font.GothamBold
-        icon.TextSize = 20
-        icon.TextColor3 = Color3.fromRGB(255, 60, 60)
-        icon.TextXAlignment = Enum.TextXAlignment.Center
-        icon.TextYAlignment = Enum.TextYAlignment.Center
-        icon.Parent = header
+        local cover = Instance.new("Frame")
+        cover.Size = UDim2.new(1, 0, 0, 10)
+        cover.Position = UDim2.new(0, 0, 1, -10)
+        cover.BackgroundColor3 = Color3.fromRGB(18, 18, 32)
+        cover.BorderSizePixel = 0
+        cover.Parent = header
 
         local title = Instance.new("TextLabel")
-        title.Size = UDim2.new(1, -50, 1, 0)
-        title.Position = UDim2.new(0, 40, 0, 0)
+        title.Size = UDim2.new(1, 0, 1, 0)
         title.BackgroundTransparency = 1
         title.Text = "M O M E N T U M   E R R O R"
         title.Font = Enum.Font.GothamBold
-        title.TextSize = 14
+        title.TextSize = 13
         title.TextColor3 = Color3.fromRGB(255, 60, 60)
-        title.TextXAlignment = Enum.TextXAlignment.Left
+        title.TextXAlignment = Enum.TextXAlignment.Center
         title.TextYAlignment = Enum.TextYAlignment.Center
         title.Parent = header
 
-        local ln = Instance.new("Frame")
-        ln.Size = UDim2.new(1, 0, 0, 2)
-        ln.Position = UDim2.new(0, 0, 1, 0)
-        ln.BorderSizePixel = 0
-        ln.BackgroundColor3 = Color3.fromRGB(100, 70, 255)
-        ln.Parent = header
+        local line = Instance.new("Frame")
+        line.Size = UDim2.new(1, 0, 0, 2)
+        line.Position = UDim2.new(0, 0, 1, 0)
+        line.BorderSizePixel = 0
+        line.BackgroundColor3 = Color3.fromRGB(100, 70, 255)
+        line.Parent = header
 
-        local desc = Instance.new("TextLabel")
-        desc.Size = UDim2.new(1, -30, 0, 20)
-        desc.Position = UDim2.new(0, 15, 0, 44)
-        desc.BackgroundTransparency = 1
-        desc.Text = "Script failed to load. Error:"
-        desc.Font = Enum.Font.GothamBold
-        desc.TextSize = 12
-        desc.TextColor3 = Color3.fromRGB(160, 160, 180)
-        desc.TextXAlignment = Enum.TextXAlignment.Left
-        desc.TextYAlignment = Enum.TextYAlignment.Center
-        desc.Parent = f
-
-        local scroll = Instance.new("ScrollingFrame")
-        scroll.Size = UDim2.new(1, -30, 0, 130)
-        scroll.Position = UDim2.new(0, 15, 0, 68)
-        scroll.BackgroundColor3 = Color3.fromRGB(6, 6, 12)
-        scroll.BorderSizePixel = 0
-        scroll.ScrollBarThickness = 4
-        scroll.ScrollBarImageColor3 = Color3.fromRGB(100, 70, 255)
-        scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-        scroll.Parent = f
-        Instance.new("UICorner", scroll).CornerRadius = UDim.new(0, 6)
-
-        local errLabel = Instance.new("TextLabel")
-        errLabel.Size = UDim2.new(1, -10, 0, 0)
-        errLabel.Position = UDim2.new(0, 5, 0, 5)
-        errLabel.BackgroundTransparency = 1
-        errLabel.Text = errStr
-        errLabel.Font = Enum.Font.Code
-        errLabel.TextSize = 11
-        errLabel.TextColor3 = Color3.fromRGB(255, 80, 90)
-        errLabel.TextXAlignment = Enum.TextXAlignment.Left
-        errLabel.TextYAlignment = Enum.TextYAlignment.Top
-        errLabel.TextWrapped = true
-        errLabel.Parent = scroll
-        pcall(function()
-            errLabel.AutomaticSize = Enum.AutomaticSize.Y
-        end)
-        task.defer(function()
-            scroll.CanvasSize = UDim2.new(0, 0, 0, errLabel.TextBounds.Y + 20)
-        end)
+        local errText = Instance.new("TextLabel")
+        errText.Size = UDim2.new(1, -30, 1, -80)
+        errText.Position = UDim2.new(0, 15, 0, 42)
+        errText.BackgroundTransparency = 1
+        errText.Text = errStr
+        errText.Font = Enum.Font.Code
+        errText.TextSize = 12
+        errText.TextColor3 = Color3.fromRGB(255, 60, 60)
+        errText.TextXAlignment = Enum.TextXAlignment.Left
+        errText.TextYAlignment = Enum.TextYAlignment.Top
+        errText.TextWrapped = true
+        errText.Parent = f
 
         local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(0, 100, 0, 28)
-        btn.Position = UDim2.new(0.5, -50, 1, -40)
-        btn.BackgroundColor3 = Color3.fromRGB(100, 70, 255)
+        btn.Size = UDim2.new(0, 80, 0, 26)
+        btn.Position = UDim2.new(0.5, -40, 1, -36)
+        btn.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
         btn.Text = "CLOSE"
         btn.Font = Enum.Font.GothamBold
-        btn.TextSize = 12
+        btn.TextSize = 11
         btn.TextColor3 = Color3.new(1, 1, 1)
         btn.BorderSizePixel = 0
         btn.Parent = f
         Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
 
-        btn.MouseEnter:Connect(function()
-            TS2:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(130, 100, 255)}):Play()
-        end)
-        btn.MouseLeave:Connect(function()
-            TS2:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(100, 70, 255)}):Play()
-        end)
-        btn.MouseButton1Click:Connect(function()
-            TS2:Create(overlay, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play()
-            TS2:Create(f, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play()
-            task.delay(0.25, function() pcall(function() sg:Destroy() end) end)
-        end)
-
-        f.Size = UDim2.new(0, 0, 0, 0)
-        f.Position = UDim2.new(0.5, 0, 0.5, 0)
-        f.BackgroundTransparency = 0.5
-        TS2:Create(f, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0, 500, 0, 260),
-            Position = UDim2.new(0.5, -250, 0.5, -130),
-            BackgroundTransparency = 0
-        }):Play()
+        btn.MouseButton1Click:Connect(function() pcall(function() sg:Destroy() end) end)
     end)
 end
