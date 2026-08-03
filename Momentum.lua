@@ -289,12 +289,12 @@ local function destroyScript()
     removeWings()
     if wingConn then wingConn:Disconnect() wingConn = nil end
 
-    if activeClones then
-        for _, c in ipairs(activeClones) do
-            pcall(function() c:Destroy() end)
+    pcall(function()
+        for _, c in pairs(activeClones) do
+            if c and c.Parent then c:Destroy() end
         end
         activeClones = {}
-    end
+    end)
 
     local char = plr.Character
     if char then
