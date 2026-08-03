@@ -289,6 +289,13 @@ local function destroyScript()
     removeWings()
     if wingConn then wingConn:Disconnect() wingConn = nil end
 
+    if activeClones then
+        for _, c in ipairs(activeClones) do
+            pcall(function() c:Destroy() end)
+        end
+        activeClones = {}
+    end
+
     local char = plr.Character
     if char then
         local hum = char:FindFirstChildOfClass("Humanoid")
@@ -1837,6 +1844,116 @@ wBtn.MouseButton1Click:Connect(function()
     else
         removeWings()
     end
+end)
+
+-- CLONE JUMP
+local cloneJumpEnabled = false
+local activeClones = {}
+
+local function spawnClone(char)
+    if not cloneJumpEnabled then return end
+    local ok, clone = pcall(function()
+        local cl = char:Clone()
+        cl.Name = "MomentumClone"
+        for _, p in ipairs(cl:GetDescendants()) do
+            if p:IsA("BasePart") then
+                p.Transparency = 0.5
+                p.Anchored = true
+                p.CanCollide = false
+                p.CastShadow = false
+            elseif p:IsA("Decal") then
+                p.Transparency = 0.5
+            elseif p:IsA("Script") or p:IsA("LocalScript") or p:IsA("ModuleScript") then
+                p:Destroy()
+            end
+        end
+        local hrp = cl:FindFirstChild("HumanoidRootPart")
+        if hrp and char:FindFirstChild("HumanoidRootPart") then
+            hrp.CFrame = char:FindFirstChild("HumanoidRootPart").CFrame
+        end
+        local hum = cl:FindFirstChildOfClass("Humanoid")
+        if hum then hum.PlatformStand = true end
+        cl.Parent = workspace
+        return cl
+    end)
+    if not ok or not clone then return end
+    table.insert(activeClones, clone)
+
+    task.delay(1.5, function()
+        if clone and clone.Parent then
+            for _, p in ipairs(clone:GetDescendants()) do
+                if p:IsA("BasePart") or p:IsA("Decal") then
+                    p.Transparency = 1
+                end
+            end
+            task.wait(0.3)
+            pcall(function() clone:Destroy() end)
+            for i, c in ipairs(activeClones) do
+                if c == clone then table.remove(activeClones, i) break end
+            end
+        end
+    end)
+end
+
+local function cleanupClones()
+    for _, c in ipairs(activeClones) do
+        pcall(function() c:Destroy() end)
+    end
+    activeClones = {}
+end
+
+plr.CharacterAdded:Connect(function(char)
+    local hum = char:WaitForChild("Humanoid", 10)
+    if not hum then return end
+    hum.StateChanged:Connect(function(_, newState)
+        if newState == Enum.HumanoidStateType.Jumping then
+            spawnClone(char)
+        end
+    end)
+end)
+
+game:GetService("Players").PlayerRemoving:Connect(function(p)
+    if p == plr then
+        cleanupClones()
+    end
+end)
+
+-- CLONE JUMP CHECKBOX
+local cjCheck = Instance.new("Frame")
+cjCheck.Size = UDim2.new(0, 16, 0, 16)
+cjCheck.Position = UDim2.new(0, 15, 0, 135)
+cjCheck.BackgroundColor3 = BG_LIGHT
+cjCheck.BorderSizePixel = 0
+cjCheck.Parent = visualTab
+addCorner(cjCheck, 3)
+
+local cjFill = Instance.new("Frame")
+cjFill.Size = UDim2.new(1, -4, 1, -4)
+cjFill.Position = UDim2.new(0, 2, 0, 2)
+cjFill.BackgroundColor3 = BG_HOVER
+cjFill.BorderSizePixel = 0
+cjFill.Parent = cjCheck
+
+local cjLab = Instance.new("TextLabel")
+cjLab.Size = UDim2.new(0, 140, 0, 16)
+cjLab.Position = UDim2.new(0, 22, 0, 0)
+cjLab.BackgroundTransparency = 1
+cjLab.Text = "clone jump"
+cjLab.Font = Enum.Font.GothamBold
+cjLab.TextSize = 14
+cjLab.TextColor3 = TXT_DIM
+cjLab.TextXAlignment = Enum.TextXAlignment.Left
+cjLab.Parent = cjCheck
+
+local cjBtn = Instance.new("TextButton")
+cjBtn.Size = UDim2.new(1, 0, 1, 0)
+cjBtn.BackgroundTransparency = 1
+cjBtn.Text = ""
+cjBtn.Parent = cjCheck
+
+cjBtn.MouseButton1Click:Connect(function()
+    cloneJumpEnabled = not cloneJumpEnabled
+    cjFill.BackgroundColor3 = cloneJumpEnabled and ACCENT or BG_HOVER
 end)
 
 -- WORLD TAB - SHADERS
